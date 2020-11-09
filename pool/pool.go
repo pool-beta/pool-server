@@ -112,9 +112,11 @@ type Pool interface {
 type pool struct {
 	id PoolID
 	name string
+	reserve USDollar
 
 	pushers []UserID
 	pullers []UserID
+
 	owners []UserID
 	admins []UserID
 	members []UserID
@@ -137,9 +139,11 @@ func initPool(id PoolID, name string, owner UserID) *pool {
 	return &pool {
 		id: id,
 		name: name,
+		reserve: USDollar(0), // Always start with zero
 
 		pushers: pushers,
 		pullers: pullers,
+
 		owners: owners,
 		admins: admins,
 		members: members,

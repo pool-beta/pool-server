@@ -1,0 +1,40 @@
+package pool
+
+import (
+	"fmt"
+
+	. "github.com/pool-beta/pool-server/types"
+)
+
+type Stream interface {
+	Pull(amount USDollar) error
+	Push(amount USDollar) error
+}
+
+type stream struct {
+	owner UserID
+	// Source
+	pullPool Pool
+	// Destination
+	pushPool Pool
+}
+
+func NewStream(owner UserID, pullPool Pool, pushPool Pool) (Stream, error) {
+	if pushPool == nil || pullPool == nil {
+		return nil, fmt.Errorf("Invalid pushPool or pullPool")
+	}
+
+	return &stream{
+		owner: owner,
+		pullPool: pullPool,
+		pushPool: pushPool,
+	}, nil
+}
+
+func (s *stream) Pull(amount USDollar) error {
+	return nil
+}
+
+func (s *stream) Push(amount USDollar) error {
+	return nil
+}
