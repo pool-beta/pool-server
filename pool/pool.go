@@ -145,12 +145,24 @@ func initPool(id PoolID, name string, owner UserID) *pool {
 }
 
 // Triggers
+
+// Add to this pool
 func (p *pool) Push(drop Drop) error {
 	return nil
 }
 
+// Take from this pool
 func (p *pool) Pull(drop Drop) error {
-	// Pull from pullers if needed
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	amount := drop.Amount()
+	if amount < p.reserve {
+		p.reserve -= amount
+	} else {
+		// Pull from pullers
+
+	}
 
 	return nil
 }
@@ -221,6 +233,17 @@ func (p *pool) Fund(amount USDollar) USDollar {
 	return p.reserve
 }
 
+// -------------------------------------------------------------------------------------------------------------
+/* 
+	Helper Functions
+*/
+
+// Pull from pullers
+func (p *pool) pull(drop Drop) error {
+	
+	
+	return nil
+}
 
 
 

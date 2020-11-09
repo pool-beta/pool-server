@@ -15,6 +15,9 @@ import (
 */
 
 type Drop interface {
+	// Getters
+	Amount() USDollar
+
 	// Accept the drop; follow thru
 	Absorb()
 	// Reject the drop; return the previous state
@@ -27,18 +30,16 @@ type drop struct {
 	// Corresponding Pool
 	pool Pool
 	amount USDollar
-	isAdd bool
 
 	droplets []Drop
 }
 
-func NewDrop(pool Pool, amount USDollar, isAdd bool) Drop {
+func NewDrop(pool Pool, amount USDollar) Drop {
 	droplets := make([]Drop, 0)
 
 	return &drop{
 		pool: pool,
 		amount: amount,
-		isAdd: isAdd,
 		droplets: droplets,
 	}
 }
@@ -64,4 +65,9 @@ func (d *drop) Reject() {
 
 	// Return to previous state
 
+}
+
+// Getters
+func (d *drop) Amount() USDollar {
+	return d.amount
 }

@@ -6,6 +6,13 @@ import (
 	. "github.com/pool-beta/pool-server/types"
 )
 
+/* 
+	Stream implements a connection between pools
+
+	Note:
+		- Drops should NEVER be started at a stream; instead, they should be started on the pool they correspond to
+*/
+
 type Stream interface {
 	Pull(Drop) error
 	Push(Drop) error
@@ -17,6 +24,12 @@ type stream struct {
 	pullPool Pool
 	// Destination
 	pushPool Pool
+
+	// Pull Config
+	allowOverdraft bool
+	percentageOverdraft Percent
+	maxOverdraft USDollar
+	minOverdraft USDollar
 }
 
 func NewStream(owner UserID, pullPool Pool, pushPool Pool) (Stream, error) {

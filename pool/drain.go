@@ -6,6 +6,11 @@ import (
 	. "github.com/pool-beta/pool-server/types"
 )
 
+/* 
+	Drain is pool with no reserve, and cannot push
+	It can only pull, and implements the debit card
+*/
+
 type Drain interface {
 	// Extends Pool
 	Pool

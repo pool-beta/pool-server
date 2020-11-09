@@ -37,7 +37,7 @@ func TestSimpleDrain(t *testing.T) {
 	debit1.AddPusher(stream1)
 	pool1.AddPuller(stream1)
 
-	// Drop
+	// Pull Drop
 	drop1 := NewDrop(debit1, pullAmount)
 	err = debit1.Pull(drop1)
 	if err != nil {
