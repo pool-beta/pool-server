@@ -205,6 +205,8 @@ func (p *pool) Push(drop Drop) error {
 }
 
 func (p *pool) Pull(drop Drop) error {
+	// Pull from pullers if needed
+
 	return nil
 }
 

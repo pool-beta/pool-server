@@ -1,7 +1,7 @@
 package pool
 
 import (
-
+	. "github.com/pool-beta/pool-server/types"
 )
 
 /*
@@ -17,8 +17,16 @@ type Drop interface {
 type drop struct {
 	// Corresponding Pool
 	pool Pool
+	amount USDollar
 }
 
-func NewDrop() Drop {
-	return nil
+func NewDrop(pool Pool, amount USDollar) Drop {
+	return &drop{
+		pool: pool,
+		amount: amount,
+	}
+}
+
+func (d *drop) Finalize() {
+	
 }

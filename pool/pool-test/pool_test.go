@@ -1,8 +1,9 @@
-package pool
+package pool_test
 
 import (
 	"testing"
 
+	. "github.com/pool-beta/pool-server/pool"
 	. "github.com/pool-beta/pool-server/types"
 )
 

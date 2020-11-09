@@ -32,7 +32,7 @@ func NewStream(owner UserID, pullPool Pool, pushPool Pool) (Stream, error) {
 }
 
 func (s *stream) Pull(drop Drop) error {
-	return nil
+	return s.pullPool.Pull(drop)
 }
 
 func (s *stream) Push(drop Drop) error {
