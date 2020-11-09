@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	. "github.com/pool-beta/pool-server/types"
-	"github.com/pool-beta/pool-server/utils"
 )
 
 
@@ -88,14 +87,8 @@ func (pf *poolFactory) ReturnPool(pid PoolID) error {
 //--------------------------------------------------------------------------------------------------
 
 type Pool interface {
-	// Admin Control
-	AdminCheck(user UserID, level string) bool
-	AddOwner(UserID) error
-	RemoveOwner(UserID) error
-	AddAdmin(UserID) error
-	RemoveAdmin(UserID) error
-	AddMember(UserID) error
-	RemoveMember(UserID) error
+	// Auth
+	PoolAuth
 
 	// Drop Control
 	AddPusher(Stream) error
@@ -110,16 +103,13 @@ type Pool interface {
 }
 
 type pool struct {
+	*poolAuth
 	id PoolID
 	name string
 	reserve USDollar
 
 	pushers []Stream
 	pullers []Stream
-
-	owners []UserID
-	admins []UserID
-	members []UserID
 
 	mutex sync.Mutex
 }
@@ -130,12 +120,11 @@ func initPool(id PoolID, name string, owner UserID) *pool {
 	pushers := make([]Stream, 0)
 	pullers := make([]Stream, 0)
 
-	owners := make([]UserID, 1)
-	admins := make([]UserID, 0)
-	members := make([]UserID, 0)
+	// Creat PoolAuth
+	auth := NewPoolAuth(id)
 
 	// Add Original Owner
-	owners[0] = owner
+	auth.AddOwner(owner)
 
 	return &pool {
 		id: id,
@@ -145,9 +134,7 @@ func initPool(id PoolID, name string, owner UserID) *pool {
 		pushers: pushers,
 		pullers: pullers,
 
-		owners: owners,
-		admins: admins,
-		members: members,
+		poolAuth: auth,
 	}
 }
 
@@ -215,94 +202,6 @@ func (p *pool) Reset() error {
 }
 
 
-// Admin
-func (p *pool) AdminCheck(user UserID, level string) bool {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-	
-	ok := false
-	switch level {
-	case "owner":
-		_, ok = utils.Find(p.owners, user)
-	case "admin":
-		_, ok = utils.Find(p.admins, user)
-	case "member":
-		_, ok = utils.Find(p.members, user)
-	}
-	return ok
-}
-
-func (p *pool) AddOwner(user UserID) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	// TODO: Validate user
-
-	p.owners = append(p.owners, user) 
-	return nil
-}
-
-func (p *pool) RemoveOwner(user UserID) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	// TODO: Validate user
-
-	owners, ok := utils.FindAndRemove(p.owners, user)
-	if !ok {
-		return fmt.Errorf("User is not an owner of this pool -- userID: %v; poolID: %v", user, p.id)
-	}
-	p.owners = owners
-	return nil
-}
-
-func (p *pool) AddAdmin(user UserID) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	// TODO: Validate user
-
-	p.admins = append(p.admins, user) 
-	return nil
-}
-
-func (p *pool) RemoveAdmin(user UserID) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	// TODO: Validate user
-
-	admins, ok := utils.FindAndRemove(p.admins, user)
-	if !ok {
-		return fmt.Errorf("User is not an admin of this pool -- userID: %v; poolID: %v", user, p.id)
-	}
-	p.admins = admins
-	return nil
-}
-
-func (p *pool) AddMember(user UserID) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	// TODO: Validate user
-
-	p.members = append(p.members, user) 
-	return nil
-}
-
-func (p *pool) RemoveMember(user UserID) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	// TODO: Validate user
-
-	members, ok := utils.FindAndRemove(p.members, user)
-	if !ok {
-		return fmt.Errorf("User is not a member of this pool -- userID: %v; poolID: %v", user, p.id)
-	}
-	p.members = members
-	return nil
-}
 
 
 
