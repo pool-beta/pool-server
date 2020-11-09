@@ -11,7 +11,7 @@ import (
 // PoolFactory contains the API for managing Pools (singleton)
 type PoolFactory interface {
 	// Creates a new Pool
-	CreatePool(owner UserID, poolName string) (Pool, error)
+	CreatePool(string, UserID) (Pool, error)
 	RetrievePool(PoolID) (Pool, error)
 	ReturnPool(PoolID) error
 }
@@ -37,7 +37,7 @@ func NewPoolFactory() (PoolFactory, error) {
 	}, nil
 }
 
-func (pf *poolFactory) CreatePool(owner UserID, poolName string) (Pool, error) {
+func (pf *poolFactory) CreatePool(poolName string, owner UserID) (Pool, error) {
 	// TODO: Validate owner
 
 	// Create a new pool id
@@ -100,6 +100,9 @@ type Pool interface {
 	Pull(Drop) error
 	Push(Drop) error
 	Reset() error // (?)
+
+	// For Tests
+	Fund(USDollar) USDollar
 }
 
 type pool struct {
@@ -199,6 +202,15 @@ func (p *pool) Pull(drop Drop) error {
 
 func (p *pool) Reset() error {
 	return nil
+}
+
+// For tesing
+func (p *pool) Fund(amount USDollar) USDollar {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	p.reserve += amount
+	return p.reserve
 }
 
 

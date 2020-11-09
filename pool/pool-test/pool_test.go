@@ -21,7 +21,7 @@ func TestSinglePoolMethods(t *testing.T) {
 	user2 := NewUserID()
 	
 	// Create Pool
-	pool, err := pf.CreatePool(user1, "pool 1")
+	pool, err := pf.CreatePool("pool1", user1)
 	if err != nil {
 		t.Errorf("Error in CreatePool for user %v", user1)
 	}
