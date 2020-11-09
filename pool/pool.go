@@ -12,7 +12,7 @@ import (
 // PoolFactory contains the API for managing Pools (singleton)
 type PoolFactory interface {
 	// Creates a new Pool
-	CreateNewPool(owner UserID, poolName string) (Pool, error)
+	CreatePool(owner UserID, poolName string) (Pool, error)
 	RetreivePool(PoolID) (Pool, error)
 }
 
@@ -29,7 +29,7 @@ func NewPoolFactory() (PoolFactory, error) {
 	}, nil
 }
 
-func (pFactory *poolFactory) CreateNewPool(owner UserID, poolName string) (Pool, error) {
+func (pFactory *poolFactory) CreatePool(owner UserID, poolName string) (Pool, error) {
 	// TODO: Validate owner
 
 	// Create a new pool id
@@ -54,6 +54,7 @@ type Pool interface {
 	RemovePuller(UserID) error
 
 	// Admin Power
+	AdminCheck(user UserID, level string) bool
 	AddOwner(UserID) error
 	RemoveOwner(UserID) error
 	AddAdmin(UserID) error
@@ -150,6 +151,23 @@ func (p *pool) RemovePuller(user UserID) error {
 	}
 	p.pullers = pullers
 	return nil
+}
+
+// Admin
+func (p *pool) AdminCheck(user UserID, level string) bool {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	
+	ok := false
+	switch level {
+	case "owner":
+		_, ok = utils.Find(p.owners, user)
+	case "admin":
+		_, ok = utils.Find(p.admins, user)
+	case "member":
+		_, ok = utils.Find(p.members, user)
+	}
+	return ok
 }
 
 func (p *pool) AddOwner(user UserID) error {
