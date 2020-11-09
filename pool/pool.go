@@ -13,7 +13,7 @@ import (
 type PoolFactory interface {
 	// Creates a new Pool
 	CreatePool(owner UserID, poolName string) (Pool, error)
-	RetreivePool(PoolID) (Pool, error)
+	RetrievePool(PoolID) (Pool, error)
 	ReturnPool(PoolID) error
 }
 
@@ -56,14 +56,14 @@ func (pf *poolFactory) CreatePool(owner UserID, poolName string) (Pool, error) {
 	return pool, nil
 }
 
-func (pf *poolFactory) RetreivePool(pid PoolID) (Pool, error) {
+func (pf *poolFactory) RetrievePool(pid PoolID) (Pool, error) {
 	pr, ok := pf.pools[pid]
 	if !ok {
 		return nil, fmt.Errorf("Pool does not exist -- pool: %v", pid)
 	}
 
 	pr.mutex.Lock()
-	defer pr.mutex.Lock()
+	defer pr.mutex.Unlock()
 
 	pr.refCount++
 	return pr.pool, nil
