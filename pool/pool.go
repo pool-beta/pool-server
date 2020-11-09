@@ -104,61 +104,127 @@ func initPool(id PoolID, name string, owner UserID) *pool {
 	}
 }
 
-func (p *pool) AddPusher(pusher UserID) error {
+func (p *pool) AddPusher(user UserID) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	// Validate Pusher
+	// TODO: Validate user
 
-	p.pushers = append(p.pushers, pusher) 
+	p.pushers = append(p.pushers, user) 
 	return nil
 }
 
-func (p *pool) RemovePusher(pusher UserID) error {
+func (p *pool) RemovePusher(user UserID) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	// TODO: Validate Pusher
+	// TODO: Validate user
 
-	pushers, ok := utils.FindAndRemove(p.pushers, pusher)
+	pushers, ok := utils.FindAndRemove(p.pushers, user)
 	if !ok {
-		return fmt.Errorf("User is not a pusher of this pool -- userID: %v; poolID: %v", pusher, p.id)
+		return fmt.Errorf("User is not a pusher of this pool -- userID: %v; poolID: %v", user, p.id)
 	}
 	p.pushers = pushers
 	return nil
 }
 
-func (p *pool) AddPuller(UserID) error {
+func (p *pool) AddPuller(user UserID) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	// TODO: Validate user
+
+	p.pullers = append(p.pullers, user) 
 	return nil
 }
 
-func (p *pool) RemovePuller(UserID) error {
+func (p *pool) RemovePuller(user UserID) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	// TODO: Validate user
+
+	pullers, ok := utils.FindAndRemove(p.pullers, user)
+	if !ok {
+		return fmt.Errorf("User is not a puller of this pool -- userID: %v; poolID: %v", user, p.id)
+	}
+	p.pullers = pullers
 	return nil
 }
 
-func (p *pool) AddOwner(UserID) error {
+func (p *pool) AddOwner(user UserID) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	// TODO: Validate user
+
+	p.owners = append(p.owners, user) 
 	return nil
 }
 
-func (p *pool) RemoveOwner(UserID) error {
+func (p *pool) RemoveOwner(user UserID) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	// TODO: Validate user
+
+	owners, ok := utils.FindAndRemove(p.owners, user)
+	if !ok {
+		return fmt.Errorf("User is not an owner of this pool -- userID: %v; poolID: %v", user, p.id)
+	}
+	p.owners = owners
 	return nil
 }
 
-func (p *pool) AddAdmin(UserID) error {
+func (p *pool) AddAdmin(user UserID) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	// TODO: Validate user
+
+	p.admins = append(p.admins, user) 
 	return nil
 }
 
-func (p *pool) RemoveAdmin(UserID) error {
+func (p *pool) RemoveAdmin(user UserID) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	// TODO: Validate user
+
+	admins, ok := utils.FindAndRemove(p.admins, user)
+	if !ok {
+		return fmt.Errorf("User is not an admin of this pool -- userID: %v; poolID: %v", user, p.id)
+	}
+	p.pushers = admins
 	return nil
 }
 
-func (p *pool) AddMember(UserID) error {
+func (p *pool) AddMember(user UserID) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	// TODO: Validate user
+
+	p.members = append(p.members, user) 
 	return nil
 }
 
-func (p *pool) RemoveMember(UserID) error {
+func (p *pool) RemoveMember(user UserID) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	// TODO: Validate user
+
+	members, ok := utils.FindAndRemove(p.members, user)
+	if !ok {
+		return fmt.Errorf("User is not a member of this pool -- userID: %v; poolID: %v", user, p.id)
+	}
+	p.members = members
 	return nil
 }
+
+// Triggers
 
 func (p *pool) Push() error {
 	return nil
