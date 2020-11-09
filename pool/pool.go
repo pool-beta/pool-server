@@ -8,7 +8,7 @@ import (
 )
 
 
-// PoolFactory contains the API for managing Pools (singleton)
+// PoolFactory contains the API for managing Pools (singleton; manually managed)
 type PoolFactory interface {
 	// Creates a new Pool
 	CreatePool(string, UserID) (Pool, error)
