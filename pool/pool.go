@@ -1,8 +1,11 @@
 package pool
 
 import (
+	"fmt"
 	"sync"
+
 	. "github.com/pool-beta/pool-server/types"
+	"github.com/pool-beta/pool-server/utils"
 )
 
 
@@ -115,10 +118,13 @@ func (p *pool) RemovePusher(pusher UserID) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	// Validate Pusher
+	// TODO: Validate Pusher
 
-	p.pushers = append(p.pushers, pusher) 
-
+	pushers, ok := utils.FindAndRemove(p.pushers, pusher)
+	if !ok {
+		return fmt.Errorf("User is not a pusher of this pool -- userID: %v; poolID: %v", pusher, p.id)
+	}
+	p.pushers = pushers
 	return nil
 }
 
