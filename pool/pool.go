@@ -14,33 +14,74 @@ type PoolFactory interface {
 	// Creates a new Pool
 	CreatePool(owner UserID, poolName string) (Pool, error)
 	RetreivePool(PoolID) (Pool, error)
+	ReturnPool(PoolID) error
 }
 
 type poolFactory struct {
-	pools map[PoolID]*pool
+	pools map[PoolID]*poolRef
+	mutex sync.Mutex
+}
+
+// Interal struct for PoolFactory to keep track of active Pools
+// TODO: Flushing mechanism of some sort
+type poolRef struct {
+	pool Pool
+	refCount int
 	mutex sync.Mutex
 }
 
 func NewPoolFactory() (PoolFactory, error) {
-	pools := make(map[PoolID]*pool)
+	pools := make(map[PoolID]*poolRef)
 
 	return &poolFactory{
 		pools: pools,
 	}, nil
 }
 
-func (pFactory *poolFactory) CreatePool(owner UserID, poolName string) (Pool, error) {
+func (pf *poolFactory) CreatePool(owner UserID, poolName string) (Pool, error) {
 	// TODO: Validate owner
 
 	// Create a new pool id
 	pid := NewPoolID()
 
 	pool := initPool(pid, poolName, owner)
+
+	// Create poolRef
+	pr := &poolRef{
+		pool: pool,
+		refCount: 1,
+	}
+
+	pf.pools[pid] = pr
 	return pool, nil
 }
 
-func (pFactory *poolFactory) RetreivePool(pid PoolID) (Pool, error) {
-	return nil, nil
+func (pf *poolFactory) RetreivePool(pid PoolID) (Pool, error) {
+	pr, ok := pf.pools[pid]
+	if !ok {
+		return nil, fmt.Errorf("Pool does not exist -- pool: %v", pid)
+	}
+
+	pr.mutex.Lock()
+	defer pr.mutex.Lock()
+
+	pr.refCount++
+	return pr.pool, nil
+}
+
+func (pf *poolFactory) ReturnPool(pid PoolID) error {
+	pr, ok := pf.pools[pid]
+	if !ok {
+		return fmt.Errorf("Pool does not exist -- pool: %v", pid)
+	}
+
+	pr.mutex.Lock()
+	defer pr.mutex.Unlock()
+
+	pr.refCount--
+
+	// TODO: Flush when refCount == 0
+	return nil
 }
 
 
