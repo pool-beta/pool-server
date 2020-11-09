@@ -103,6 +103,7 @@ type Pool interface {
 
 	// For Tests
 	Fund(USDollar) USDollar
+	GetReserve() USDollar
 }
 
 type pool struct {
@@ -211,6 +212,10 @@ func (p *pool) Fund(amount USDollar) USDollar {
 
 	p.reserve += amount
 	return p.reserve
+}
+
+func (p *pool) GetReserve() USDollar {
+	return p.Fund(USDollar(0))
 }
 
 
