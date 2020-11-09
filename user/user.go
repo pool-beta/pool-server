@@ -11,4 +11,5 @@ type User interface {
 type user struct {
 	id UserID
 	name string
+	reserve USDollar
 }
