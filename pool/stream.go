@@ -7,8 +7,8 @@ import (
 )
 
 type Stream interface {
-	Pull(amount USDollar) error
-	Push(amount USDollar) error
+	Pull(Drop) error
+	Push(Drop) error
 }
 
 type stream struct {
@@ -31,10 +31,10 @@ func NewStream(owner UserID, pullPool Pool, pushPool Pool) (Stream, error) {
 	}, nil
 }
 
-func (s *stream) Pull(amount USDollar) error {
+func (s *stream) Pull(drop Drop) error {
 	return nil
 }
 
-func (s *stream) Push(amount USDollar) error {
+func (s *stream) Push(drop Drop) error {
 	return nil
 }

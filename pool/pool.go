@@ -88,13 +88,7 @@ func (pf *poolFactory) ReturnPool(pid PoolID) error {
 //--------------------------------------------------------------------------------------------------
 
 type Pool interface {
-	// Money Power
-	AddPusher(UserID) error
-	RemovePusher(UserID) error
-	AddPuller(UserID) error
-	RemovePuller(UserID) error
-
-	// Admin Power
+	// Admin Control
 	AdminCheck(user UserID, level string) bool
 	AddOwner(UserID) error
 	RemoveOwner(UserID) error
@@ -103,9 +97,15 @@ type Pool interface {
 	AddMember(UserID) error
 	RemoveMember(UserID) error
 
-	// Triggers (?)
-	Pull() error
-	Push() error
+	// Drop Control
+	AddPusher(Stream) error
+	RemovePusher(Stream) error
+	AddPuller(Stream) error
+	RemovePuller(Stream) error
+
+	// Drop
+	Pull(Drop) error
+	Push(Drop) error
 	Reset() error // (?)
 }
 
@@ -114,8 +114,8 @@ type pool struct {
 	name string
 	reserve USDollar
 
-	pushers []UserID
-	pullers []UserID
+	pushers []Stream
+	pullers []Stream
 
 	owners []UserID
 	admins []UserID
@@ -126,9 +126,10 @@ type pool struct {
 
 // Used by PoolFactory to init a Pool; error check should be already done
 func initPool(id PoolID, name string, owner UserID) *pool {
-	// Init
-	pushers := make([]UserID, 0)
-	pullers := make([]UserID, 0)
+	// Initialize
+	pushers := make([]Stream, 0)
+	pullers := make([]Stream, 0)
+
 	owners := make([]UserID, 1)
 	admins := make([]UserID, 0)
 	members := make([]UserID, 0)
@@ -150,53 +151,67 @@ func initPool(id PoolID, name string, owner UserID) *pool {
 	}
 }
 
-func (p *pool) AddPusher(user UserID) error {
+func (p *pool) AddPusher(stream Stream) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
 	// TODO: Validate user
 
-	p.pushers = append(p.pushers, user) 
+	p.pushers = append(p.pushers, stream) 
 	return nil
 }
 
-func (p *pool) RemovePusher(user UserID) error {
+func (p *pool) RemovePusher(stream Stream) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
 	// TODO: Validate user
 
-	pushers, ok := utils.FindAndRemove(p.pushers, user)
+	pushers, ok := FindAndRemove(p.pushers, stream)
 	if !ok {
-		return fmt.Errorf("User is not a pusher of this pool -- userID: %v; poolID: %v", user, p.id)
+		return fmt.Errorf("User is not a pusher of this pool -- userID: %v; poolID: %v", stream, p.id)
 	}
 	p.pushers = pushers
 	return nil
 }
 
-func (p *pool) AddPuller(user UserID) error {
+func (p *pool) AddPuller(stream Stream) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
 	// TODO: Validate user
 
-	p.pullers = append(p.pullers, user) 
+	p.pullers = append(p.pullers, stream) 
 	return nil
 }
 
-func (p *pool) RemovePuller(user UserID) error {
+func (p *pool) RemovePuller(stream Stream) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
 	// TODO: Validate user
 
-	pullers, ok := utils.FindAndRemove(p.pullers, user)
+	pullers, ok := FindAndRemove(p.pullers, stream)
 	if !ok {
-		return fmt.Errorf("User is not a puller of this pool -- userID: %v; poolID: %v", user, p.id)
+		return fmt.Errorf("User is not a puller of this pool -- userID: %v; poolID: %v", stream, p.id)
 	}
 	p.pullers = pullers
 	return nil
 }
+
+// Triggers
+func (p *pool) Push(drop Drop) error {
+	return nil
+}
+
+func (p *pool) Pull(drop Drop) error {
+	return nil
+}
+
+func (p *pool) Reset() error {
+	return nil
+}
+
 
 // Admin
 func (p *pool) AdminCheck(user UserID, level string) bool {
@@ -259,7 +274,7 @@ func (p *pool) RemoveAdmin(user UserID) error {
 	if !ok {
 		return fmt.Errorf("User is not an admin of this pool -- userID: %v; poolID: %v", user, p.id)
 	}
-	p.pushers = admins
+	p.admins = admins
 	return nil
 }
 
@@ -287,18 +302,5 @@ func (p *pool) RemoveMember(user UserID) error {
 	return nil
 }
 
-// Triggers
-
-func (p *pool) Push() error {
-	return nil
-}
-
-func (p *pool) Pull() error {
-	return nil
-}
-
-func (p *pool) Reset() error {
-	return nil
-}
 
 
