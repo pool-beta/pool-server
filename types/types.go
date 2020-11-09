@@ -10,10 +10,17 @@ type UserID = uint64
 /* USDollar */
 type USDollar uint64
 
-func NewUSDollar(dollar int, cent int) USDollar {
+func NewUSDollar(dollar int, cent int) (USDollar, error) {
+	if dollar < 0 || cent < 0 {
+		return USDollar(0), fmt.Errorf("invalid values for dollar or cent -- dollar: %v; cent: %v", dollar, cent)
+	}
+	if cent > 99 {
+		return USDollar(0), fmt.Errorf("cent must be less than 99 -- cent: %v", cent)
+	}
+
 	d := USDollar(dollar) * USDollar(100)
 	c := USDollar(cent)
-	return d + c
+	return d + c, nil
 }
 
 func (us *USDollar) String() string {
@@ -28,6 +35,13 @@ func (us *USDollar) String() string {
 	return fmt.Sprintf("$%v.%v%v", d, lead, c)
 }
 
+// Returns USDollar that p% of us 
+func (us *USDollar) MultiplyPercent(p Percent) USDollar {
+	usFloat := float64(*us)
+	product := usFloat * p.Float() / float64(100)
+
+	return USDollar(product)
+}
 
 /* Percent */
 type Number uint8
@@ -37,6 +51,7 @@ type Percent interface {
 	Add(Percent) Percent
 	ToOne() (Percent, bool)
 	IsOne() bool
+	Float() float64
 	String() string
 }
 
@@ -91,14 +106,17 @@ func (p *percent) IsOne() bool {
 	return p.numerator == p.denominator
 }
 
-func (p *percent) String() string {
+func (p *percent) Float() float64 {
 	numFloat := float64(p.numerator)
 	denFloat := float64(p.denominator)
 	percentFloat := numFloat / denFloat * float64(100)
 
-	return fmt.Sprintf("%v%%", percentFloat)
+	return percentFloat
 }
 
+func (p *percent) String() string {
+	return fmt.Sprintf("%v%%", p.Float())
+}
 
 func (p *percent) Numerator() Number {
 	return p.numerator

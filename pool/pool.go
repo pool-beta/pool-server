@@ -245,5 +245,35 @@ func (p *pool) pull(drop Drop) error {
 	return nil
 }
 
+// Returns a map of Normalized USDollar from given streams; error if isn't possible
+func normalize(streams []Stream, amount USDollar) (map[UserID]USDollar, error) {
+	if streams == nil {
+		return nil, fmt.Errorf("Streams cannot be nil")
+	}
+	size := len(streams)
 
+	amounts := make(map[UserID]USDollar, size) // return value
+	normalized := make(map[UserID]Percent, size)
+	flexible := make(map[UserID]Stream)
+	totalPercent := NewPercent(0, 1)
+	totalAmount := USDollar(0)
+
+	// Filter Streams that allow overdraft
+	for _, stream := range streams {
+		// Check if Overdraft is allowed for each stream
+		if stream.GetAllowOverdraft() {
+			
+
+			total = total.Add(stream.GetPercentOverdraft())
+			normalized[stream.Owner()] = stream.GetPercentOverdraft()
+		}
+	}
+
+
+
+
+
+
+	return amounts, nil
+}
 

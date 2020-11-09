@@ -14,20 +14,21 @@ import (
 */
 
 type Stream interface {
-	GetConfig() *streamConfig
-
+	StreamConfig
+	Owner() UserID
 	Pull(Drop) error
 	Push(Drop) error
 }
 
 type stream struct {
+	*streamConfig
+	
 	owner UserID
 	// Source
 	pullPool Pool
 	// Destination
 	pushPool Pool
 	// Push/Pull Config
-	config *streamConfig
 }
 
 func NewStream(owner UserID, pullPool Pool, pushPool Pool) (Stream, error) {
@@ -35,9 +36,11 @@ func NewStream(owner UserID, pullPool Pool, pushPool Pool) (Stream, error) {
 		return nil, fmt.Errorf("Invalid pushPool or pullPool")
 	}
 
+	config := newStreamConfig()
 
 
 	return &stream{
+		streamConfig: config,
 		owner: owner,
 		pullPool: pullPool,
 		pushPool: pushPool,
@@ -52,10 +55,10 @@ func (s *stream) Push(drop Drop) error {
 	return nil
 }
 
-func (s *stream) GetConfig() *streamConfig {
-	return s.config
+func (s *stream) Owner() UserID {
+	return s.owner
 }
- 
+
 // -------------------------------------------------------------------------------------------------
 
 type StreamConfig interface {
@@ -66,8 +69,8 @@ type StreamConfig interface {
 	GetAllowFlexibleOverdraft() bool
 	SetAllowFlexibleOverdraft(bool)
 
-	GetPercentageOverdraft() Percent
-	SetPercentageOverdraft(Percent)
+	GetPercentOverdraft() Percent
+	SetPercentOverdraft(Percent)
 
 	GetMaxOverdraft() USDollar
 	SetMaxOverdraft(USDollar)
@@ -80,16 +83,16 @@ type streamConfig struct {
 	// Pull Config
 	allowOverdraft bool
 	allowFlexibleOverdraft bool
-	percentageOverdraft Percent
+	percentOverdraft Percent
 	maxOverdraft USDollar
-	minOverdraft USDollar
+	minOverdraft USDollar // TODO: Not Fully Supported
 }
 
-func newStreamConfig() StreamConfig {
+func newStreamConfig() *streamConfig {
 	return &streamConfig{
 		allowOverdraft: false,
 		allowFlexibleOverdraft: false,
-		percentageOverdraft: NewPercent(Number(0), Number(1)),
+		percentOverdraft: NewPercent(0, 1),
 		maxOverdraft: USDollar(0),
 		minOverdraft: USDollar(0),		
 	}
@@ -111,12 +114,12 @@ func (c *streamConfig) SetAllowFlexibleOverdraft(value bool) {
 	c.allowFlexibleOverdraft = value
 }
 
-func (c *streamConfig) GetPercentageOverdraft() Percent {
-	return c.percentageOverdraft
+func (c *streamConfig) GetPercentOverdraft() Percent {
+	return c.percentOverdraft
 }
 
-func (c *streamConfig) SetPercentageOverdraft(percent Percent) {
-	c.percentageOverdraft = percent
+func (c *streamConfig) SetPercentOverdraft(percent Percent) {
+	c.percentOverdraft = percent
 }
 
 func (c *streamConfig) GetMaxOverdraft() USDollar {
