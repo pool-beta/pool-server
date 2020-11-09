@@ -90,6 +90,9 @@ type Pool interface {
 	// Auth
 	PoolAuth
 
+	// Getters
+	GetReserve() USDollar
+
 	// Drop Control
 	AddPusher(Stream) error
 	RemovePusher(Stream) error
@@ -103,7 +106,6 @@ type Pool interface {
 
 	// For Tests
 	Fund(USDollar) USDollar
-	GetReserve() USDollar
 }
 
 type pool struct {
@@ -140,6 +142,21 @@ func initPool(id PoolID, name string, owner UserID) *pool {
 
 		poolAuth: auth,
 	}
+}
+
+// Triggers
+func (p *pool) Push(drop Drop) error {
+	return nil
+}
+
+func (p *pool) Pull(drop Drop) error {
+	// Pull from pullers if needed
+
+	return nil
+}
+
+func (p *pool) Reset() error {
+	return nil
 }
 
 func (p *pool) AddPusher(stream Stream) error {
@@ -190,19 +207,9 @@ func (p *pool) RemovePuller(stream Stream) error {
 	return nil
 }
 
-// Triggers
-func (p *pool) Push(drop Drop) error {
-	return nil
-}
-
-func (p *pool) Pull(drop Drop) error {
-	// Pull from pullers if needed
-
-	return nil
-}
-
-func (p *pool) Reset() error {
-	return nil
+// Getters
+func (p *pool) GetReserve() USDollar {
+	return p.Fund(USDollar(0))
 }
 
 // For tesing
@@ -213,11 +220,6 @@ func (p *pool) Fund(amount USDollar) USDollar {
 	p.reserve += amount
 	return p.reserve
 }
-
-func (p *pool) GetReserve() USDollar {
-	return p.Fund(USDollar(0))
-}
-
 
 
 
