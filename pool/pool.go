@@ -252,8 +252,11 @@ func normalize(streams []Stream, amount USDollar) (map[UserID]USDollar, error) {
 	}
 	size := len(streams)
 
+	var share, diff USDollar
+
 	amounts := make(map[UserID]USDollar, size) // return value
 	flexible := make(map[UserID]Stream)
+	flexiblePercents := make(map[UserID]Percent)
 	totalAmount := USDollar(0)
 
 	// Filter Streams that allow overdraft
@@ -261,16 +264,17 @@ func normalize(streams []Stream, amount USDollar) (map[UserID]USDollar, error) {
 		// Check if Overdraft is allowed for each stream
 		if stream.GetAllowOverdraft() {
 			// Check if percent of total is less than stream max
-			share := amount.MultiplyPercent(stream.GetPercentOverdraft())
+			share = amount.MultiplyPercent(stream.GetPercentOverdraft())
 			if share > stream.GetMaxOverdraft() {
 				// share is too big; take some out
-				diff := share - stream.GetMaxOverdraft()
+				diff = share - stream.GetMaxOverdraft()
 				share -= diff
 			} else {
 				// check if flexible
 				if stream.GetAllowFlexibleOverdraft() {
 					// add to flexible map
 					flexible[stream.Owner()] = stream
+					flexiblePercents[stream.Owner()] = stream.GetPercentOverdraft()
 				}
 			}
 			// add to amounts
@@ -287,27 +291,33 @@ func normalize(streams []Stream, amount USDollar) (map[UserID]USDollar, error) {
 	}
 
 	// Need more money
+	// For each iteration: (1) normalize share (2) fix max of each stream
 
 	// loop until diff is one cent
-	for diff := amount - totalAmount; diff > USDollar(1) {
+	var normalized map[UserID]Percent
+	diff = amount - totalAmount
+	for diff > USDollar(len(flexible)) {
+		// Normalize
+		normalized = NormalizePercents(flexiblePercents)
 		for uid, s := range flexible {
+			// Check Max
+			share_add := diff.MultiplyPercent(normalized[uid])
+			share = share_add + amounts[uid]
 
+			if share > s.GetMaxOverdraft() {
+				// share too big; remove from flexible
+				diff = share - s.GetMaxOverdraft()
+				share -= diff
+				delete(flexible, uid)
+			}
+
+			amounts[uid] = share
+			totalAmount += share
 		}
+		diff = amount - totalAmount
 	}
-	
 
-
-
-	// totalPercent := NewPercent(0, 1)
-	normalized := make(map[UserID]Percent, size)
-
-
-	total = total.Add(stream.GetPercentOverdraft())
-	normalized[stream.Owner()] = stream.GetPercentOverdraft()
-
-
-
-
+	// TODO: Clean up the remaining cents
 
 
 	return amounts, nil

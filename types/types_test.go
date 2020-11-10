@@ -3,8 +3,6 @@ package types
 import (
 	"fmt"
 	"testing"
-
-	"strconv"
 )
 
 func TestUSDollar(t *testing.T) {
@@ -94,9 +92,9 @@ func TestNormalizePercents(t *testing.T) {
 	}
 
 	initialTotal := NewPercent(0, 1)
-	percentMap := make(map[string]Percent)
+	percentMap := make(map[uint64]Percent)
 	for i, p := range testPercents {
-		percentMap[strconv.Itoa(i)] = p
+		percentMap[uint64(i)] = p
 		initialTotal = initialTotal.Add(p)
 	}
 

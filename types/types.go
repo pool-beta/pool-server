@@ -157,7 +157,7 @@ func (p *percent) Denominator() Number {
 }
 
 // Returns the map of Percents normalized 
-func NormalizePercents(percents map[string]Percent) map[string]Percent {
+func NormalizePercents(percents map[uint64]Percent) map[uint64]Percent {
 	// Add them up
 	total := NewPercent(0, 1)
 	for _, p := range percents {
@@ -167,7 +167,7 @@ func NormalizePercents(percents map[string]Percent) map[string]Percent {
 	if total.IsOne() {
 		return percents
 	} else {
-		normalized := make(map[string]Percent)
+		normalized := make(map[uint64]Percent)
 		for k, p := range percents {
 			normalized[k] = p.Divide(total)
 		}
