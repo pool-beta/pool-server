@@ -5,6 +5,7 @@ import (
 )
 
 type PoolID = uint64
+type StreamID = uint64
 type UserID = uint64
 
 /* USDollar */

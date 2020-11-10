@@ -15,14 +15,15 @@ import (
 
 type Stream interface {
 	StreamConfig
+	StreamID() StreamID
 	Owner() UserID
-	Pull(Drop) error
-	Push(Drop) error
+	Pull(amount USDollar) (Drop, error)
+	Push(amount USDollar) (Drop, error)
 }
 
 type stream struct {
 	*streamConfig
-	
+	streamID StreamID
 	owner UserID
 	// Source
 	pullPool Pool
@@ -37,22 +38,31 @@ func NewStream(owner UserID, pullPool Pool, pushPool Pool) (Stream, error) {
 	}
 
 	config := newStreamConfig()
+	streamID := NewStreamID()
 
+	// TODO: Add the stream to pool
 
 	return &stream{
 		streamConfig: config,
+		streamID: streamID,
 		owner: owner,
 		pullPool: pullPool,
 		pushPool: pushPool,
 	}, nil
 }
 
-func (s *stream) Pull(drop Drop) error {
-	return s.pullPool.Pull(drop)
+func (s *stream) Pull(amount USDollar) (Drop, error) {
+	drop := NewDrop(s.pullPool, amount)
+	return drop, s.pullPool.Pull(drop)
 }
 
-func (s *stream) Push(drop Drop) error {
-	return nil
+func (s *stream) Push(amount USDollar) (Drop, error) {
+	_ = NewDrop(s.pushPool, amount)
+	return nil, nil
+}
+
+func (s *stream) StreamID() StreamID {
+	return s.streamID
 }
 
 func (s *stream) Owner() UserID {

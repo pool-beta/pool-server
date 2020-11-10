@@ -1,6 +1,7 @@
 package pool_test
 
 import (
+	"fmt"
 	"testing"
 
 	. "github.com/pool-beta/pool-server/pool"
@@ -10,9 +11,9 @@ import (
 func TestSimpleDrain(t *testing.T) {
 	var err error
 
-	initialAmount := NewUSDollar(100, 0)
-	pullAmount := NewUSDollar(25, 0)
-	expectedAmount := NewUSDollar(75, 0)
+	initialAmount, _ := NewUSDollar(100, 0)
+	pullAmount, _ := NewUSDollar(25, 0)
+	expectedAmount, _ := NewUSDollar(75, 0)
 	
 	// Init PoolFactory
 	pf := initPoolFactory()
@@ -36,6 +37,8 @@ func TestSimpleDrain(t *testing.T) {
 	}
 	debit1.AddPusher(stream1)
 	pool1.AddPuller(stream1)
+
+	fmt.Println("Going to drop...")
 
 	// Pull Drop
 	drop1 := NewDrop(debit1, pullAmount)

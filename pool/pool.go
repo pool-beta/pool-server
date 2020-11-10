@@ -157,14 +157,18 @@ func (p *pool) Pull(drop Drop) error {
 	defer p.mutex.Unlock()
 
 	amount := drop.Amount()
-	if amount < p.reserve {
-		p.reserve -= amount
-	} else {
+	if amount > p.reserve {
+		// Take max from reserve
+		diff := amount - p.reserve
+		p.reserve = 0
+
 		// Pull from pullers
-
+		return p.pull(drop, diff)
+	} else {
+		// Easy -- take from reserve
+		p.reserve -= amount
+		return nil
 	}
-
-	return nil
 }
 
 func (p *pool) Reset() error {
@@ -238,15 +242,29 @@ func (p *pool) Fund(amount USDollar) USDollar {
 	Helper Functions
 */
 
-// Pull from pullers
-func (p *pool) pull(drop Drop) error {
-	
+// Pull from pushers
+func (p *pool) pull(drop Drop, amount USDollar) error {
+	// Normalize on Pusher Streams
+	amounts, err := normalize(p.pushers, amount)
+	if err != nil {
+		return err
+	}
+
+	// Send Drops according to normalized amounts
+	for _, s := range p.pushers {
+		d, err := s.Pull(amounts[s.StreamID()])
+		if err != nil {
+			// Drop not possible
+			return err
+		}
+		drop.AddDroplet(d)
+	}
 	
 	return nil
 }
 
 // Returns a map of Normalized USDollar from given streams; error if isn't possible
-func normalize(streams []Stream, amount USDollar) (map[UserID]USDollar, error) {
+func normalize(streams []Stream, amount USDollar) (map[StreamID]USDollar, error) {
 	if streams == nil {
 		return nil, fmt.Errorf("Streams cannot be nil")
 	}
@@ -254,9 +272,9 @@ func normalize(streams []Stream, amount USDollar) (map[UserID]USDollar, error) {
 
 	var share, diff USDollar
 
-	amounts := make(map[UserID]USDollar, size) // return value
-	flexible := make(map[UserID]Stream)
-	flexiblePercents := make(map[UserID]Percent)
+	amounts := make(map[StreamID]USDollar, size) // return value
+	flexible := make(map[StreamID]Stream)
+	flexiblePercents := make(map[StreamID]Percent)
 	totalAmount := USDollar(0)
 
 	// Filter Streams that allow overdraft
@@ -273,12 +291,12 @@ func normalize(streams []Stream, amount USDollar) (map[UserID]USDollar, error) {
 				// check if flexible
 				if stream.GetAllowFlexibleOverdraft() {
 					// add to flexible map
-					flexible[stream.Owner()] = stream
-					flexiblePercents[stream.Owner()] = stream.GetPercentOverdraft()
+					flexible[stream.StreamID()] = stream
+					flexiblePercents[stream.StreamID()] = stream.GetPercentOverdraft()
 				}
 			}
 			// add to amounts
-			amounts[stream.Owner()] = share
+			amounts[stream.StreamID()] = share
 			// Add to total
 			totalAmount += share
 		}
@@ -294,27 +312,32 @@ func normalize(streams []Stream, amount USDollar) (map[UserID]USDollar, error) {
 	// For each iteration: (1) normalize share (2) fix max of each stream
 
 	// loop until diff is one cent
-	var normalized map[UserID]Percent
+	var normalized map[StreamID]Percent
 	diff = amount - totalAmount
 	for diff > USDollar(len(flexible)) {
 		// Normalize
 		normalized = NormalizePercents(flexiblePercents)
-		for uid, s := range flexible {
+		for sid, s := range flexible {
 			// Check Max
-			share_add := diff.MultiplyPercent(normalized[uid])
-			share = share_add + amounts[uid]
+			share_add := diff.MultiplyPercent(normalized[sid])
+			share = share_add + amounts[sid]
 
 			if share > s.GetMaxOverdraft() {
 				// share too big; remove from flexible
 				diff = share - s.GetMaxOverdraft()
 				share -= diff
-				delete(flexible, uid)
+				delete(flexible, sid)
 			}
 
-			amounts[uid] = share
+			amounts[sid] = share
 			totalAmount += share
 		}
 		diff = amount - totalAmount
+	}
+
+	// Check if it was possible
+	if len(flexible) == 0 && diff > USDollar(0) {
+		return nil, fmt.Errorf("Cannot fulfil drop -- remaining: %v", diff.String())
 	}
 
 	// TODO: Clean up the remaining cents
