@@ -299,6 +299,9 @@ func normalize(streams []Stream, amount USDollar) (map[StreamID]USDollar, error)
 			amounts[stream.StreamID()] = share
 			// Add to total
 			totalAmount += share
+		} else {
+			// Set to zero since no overdraft
+			amounts[stream.StreamID()] = USDollar(0)
 		}
 	}
 
@@ -315,6 +318,11 @@ func normalize(streams []Stream, amount USDollar) (map[StreamID]USDollar, error)
 	var normalized map[StreamID]Percent
 	diff = amount - totalAmount
 	for diff > USDollar(len(flexible)) {
+		if len(flexible) == 0 {
+			// Can't do anything more
+			break;
+		}
+
 		// Normalize
 		normalized = NormalizePercents(flexiblePercents)
 		for sid, s := range flexible {
@@ -336,6 +344,14 @@ func normalize(streams []Stream, amount USDollar) (map[StreamID]USDollar, error)
 	}
 
 	// Check if it was possible
+	/*
+		if flexible is empty than it means that no more streams can give more
+		if diff is zero, all amounts were possible to allocate
+
+		if flexible is not empty but diff is greater than zero, it means there are a couple cents
+		we cannot split up
+	*/
+
 	if len(flexible) == 0 && diff > USDollar(0) {
 		return nil, fmt.Errorf("Cannot fulfil drop -- remaining: %v", diff.String())
 	}
