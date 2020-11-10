@@ -3,6 +3,8 @@ package types
 import (
 	"fmt"
 	"testing"
+
+	"strconv"
 )
 
 func TestUSDollar(t *testing.T) {
@@ -76,5 +78,41 @@ func TestMultiplyPercent(t *testing.T) {
 		if value != expectedValues[i] {
 			t.Errorf("Does not match -- initial amount: %v; percent: %v; expected: %v; actual: %v", initialAmount.String(), p.String(), expectedValues[i].String(), value.String())
 		}
+	}
+}
+
+func TestNormalizePercents(t *testing.T) {
+	// testPercents := []Percent{
+	// 	NewPercent(1, 2),
+	// }
+
+	testPercents := []Percent{
+		NewPercent(1, 10),
+		NewPercent(2, 10),
+		NewPercent(3, 10),
+		NewPercent(3, 10),
+	}
+
+	initialTotal := NewPercent(0, 1)
+	percentMap := make(map[string]Percent)
+	for i, p := range testPercents {
+		percentMap[strconv.Itoa(i)] = p
+		initialTotal = initialTotal.Add(p)
+	}
+
+	normalized := NormalizePercents(percentMap)
+
+	normalizedTotal	:= NewPercent(0, 1)
+	for _, n := range normalized {
+		normalizedTotal = normalizedTotal.Add(n)
+		fmt.Printf("normalized -- normalizedTotal: %v; normalizedPercent: %v\n", normalizedTotal, n)
+	}
+
+	if !normalizedTotal.IsOne() {
+		t.Errorf("Normalized does not equal 1 -- normalizedTotal: %v", normalizedTotal.String())
+	}
+
+	if initialTotal.IsOne() {
+		t.Errorf("Not a good test -- percents are already normalized")
 	}
 }

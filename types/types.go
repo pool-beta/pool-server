@@ -45,12 +45,19 @@ func (us *USDollar) MultiplyPercent(p Percent) USDollar {
 
 /* Percent */
 type Number uint8
+
 type Percent interface {
+	// Getter
 	Numerator() Number
 	Denominator() Number
+	// Math
+	Flip() Percent
 	Add(Percent) Percent
+	Multiply(Percent) Percent
+	Divide(Percent) Percent
 	ToOne() (Percent, bool)
 	IsOne() bool
+	// Out
 	Float() float64
 	String() string
 }
@@ -60,11 +67,20 @@ type percent struct {
 	denominator Number
 }
 
+// TODO: Return error for divide zero (?)
 func NewPercent(numerator Number, denominator Number) Percent {
+	divisor := gcd(numerator, denominator)
+	numerator = numerator / divisor
+	denominator = denominator / divisor
+
 	return &percent{
 		numerator: numerator,
 		denominator: denominator,
 	}
+}
+
+func (p *percent) Flip() Percent {
+	return NewPercent(p.denominator, p.numerator)
 }
 
 func (p *percent) Add(other Percent) Percent {
@@ -75,7 +91,6 @@ func (p *percent) Add(other Percent) Percent {
 	y := p.denominator * other.Denominator()
 
 	divisor := gcd(x, y)
-
 	numerator := x / divisor
 	denominator := y / divisor
 
@@ -83,6 +98,21 @@ func (p *percent) Add(other Percent) Percent {
 		numerator: numerator,
 		denominator: denominator,
 	}
+}
+
+func (p *percent) Multiply(other Percent) Percent {
+	x := p.numerator * other.Numerator()
+	y := p.denominator * other.Denominator()
+
+	divisor := gcd(x, y)
+	numerator := x / divisor
+	denominator := y / divisor
+
+	return NewPercent(numerator, denominator)
+}
+
+func (p *percent) Divide(other Percent) Percent {
+	return p.Multiply(other.Flip())
 }
 
 func (p *percent) ToOne() (Percent, bool) {
@@ -126,6 +156,25 @@ func (p *percent) Denominator() Number {
 	return p.denominator
 }
 
+// Returns the map of Percents normalized 
+func NormalizePercents(percents map[string]Percent) map[string]Percent {
+	// Add them up
+	total := NewPercent(0, 1)
+	for _, p := range percents {
+		total = total.Add(p)
+	}
+
+	if total.IsOne() {
+		return percents
+	} else {
+		normalized := make(map[string]Percent)
+		for k, p := range percents {
+			normalized[k] = p.Divide(total)
+		}
+		return normalized
+	}
+}
+
 func gcd(a Number, b Number) Number {
 	for b != 0 {
 		t := b
@@ -133,4 +182,4 @@ func gcd(a Number, b Number) Number {
 		a = t
 	}
 	return a
-} 
+}

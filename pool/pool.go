@@ -253,21 +253,57 @@ func normalize(streams []Stream, amount USDollar) (map[UserID]USDollar, error) {
 	size := len(streams)
 
 	amounts := make(map[UserID]USDollar, size) // return value
-	normalized := make(map[UserID]Percent, size)
 	flexible := make(map[UserID]Stream)
-	totalPercent := NewPercent(0, 1)
 	totalAmount := USDollar(0)
 
 	// Filter Streams that allow overdraft
 	for _, stream := range streams {
 		// Check if Overdraft is allowed for each stream
 		if stream.GetAllowOverdraft() {
-			
-
-			total = total.Add(stream.GetPercentOverdraft())
-			normalized[stream.Owner()] = stream.GetPercentOverdraft()
+			// Check if percent of total is less than stream max
+			share := amount.MultiplyPercent(stream.GetPercentOverdraft())
+			if share > stream.GetMaxOverdraft() {
+				// share is too big; take some out
+				diff := share - stream.GetMaxOverdraft()
+				share -= diff
+			} else {
+				// check if flexible
+				if stream.GetAllowFlexibleOverdraft() {
+					// add to flexible map
+					flexible[stream.Owner()] = stream
+				}
+			}
+			// add to amounts
+			amounts[stream.Owner()] = share
+			// Add to total
+			totalAmount += share
 		}
 	}
+
+	if totalAmount == amount {
+		return amounts, nil
+	} else if totalAmount > amount {
+		return nil, fmt.Errorf("Oh no, you have broken the system -- totalAmount: %v; requestedAmount: %v", totalAmount, amount)
+	}
+
+	// Need more money
+
+	// loop until diff is one cent
+	for diff := amount - totalAmount; diff > USDollar(1) {
+		for uid, s := range flexible {
+
+		}
+	}
+	
+
+
+
+	// totalPercent := NewPercent(0, 1)
+	normalized := make(map[UserID]Percent, size)
+
+
+	total = total.Add(stream.GetPercentOverdraft())
+	normalized[stream.Owner()] = stream.GetPercentOverdraft()
 
 
 
