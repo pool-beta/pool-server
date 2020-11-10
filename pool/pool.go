@@ -29,6 +29,7 @@ type poolRef struct {
 	mutex sync.Mutex
 }
 
+// TODO: Database would be inserted into PoolFactory
 func NewPoolFactory() (PoolFactory, error) {
 	pools := make(map[PoolID]*poolRef)
 
