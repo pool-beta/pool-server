@@ -40,15 +40,19 @@ func NewStream(owner UserID, pullPool Pool, pushPool Pool) (Stream, error) {
 	config := newStreamConfig()
 	streamID := NewStreamID()
 
-	// TODO: Add the stream to pool
-
-	return &stream{
+	stream := &stream{
 		streamConfig: config,
 		streamID: streamID,
 		owner: owner,
 		pullPool: pullPool,
 		pushPool: pushPool,
-	}, nil
+	}
+
+	// TODO: Add the stream to pool
+	pullPool.AddPuller(stream)
+	pushPool.AddPusher(stream)
+
+	return stream, nil
 }
 
 func (s *stream) Pull(amount USDollar) (Drop, error) {

@@ -39,8 +39,6 @@ func TestSimpleDrain(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error in NewStream -- pool1: %v; pool2: %v; user: %v", pool1, debit1, user1)
 	}
-	debit1.AddPusher(stream1)
-	pool1.AddPuller(stream1)
 
 	// Pull Drop
 	drop1 := NewDrop(debit1, pullAmount)
