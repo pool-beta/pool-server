@@ -11,14 +11,15 @@ import (
 */
 
 type Simple interface {
-	CreatePool() ()
-	CreateStream()
+	Pools() (Pools, error) // POOL
+	Users() (Users, error) // Users
 }
 
-type User interface {
-	
+type Users interface {
+	CreateUser()
 }
 
-type Pool interface {
-
+// Pools implements POOL
+type Pools interface {
+	CreatePool()
 }

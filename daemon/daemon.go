@@ -1,19 +1,23 @@
 package daemon
 
 import (
-	"io"
 	"log"
 	"net/http"
+
+	. "github.com/pool-beta/pool-server/daemon/handlers"
 )
 
 func Run() {
-	// Hello world, the web server
-
-	helloHandler := func(w http.ResponseWriter, req *http.Request) {
-		io.WriteString(w, "Hello, world!\n")
+	// Start Handlers
+	handler, err := NewHandler()
+	if err != nil {
+		log.Fatal("Error in setting up handler")
 	}
 
-	http.HandleFunc("/hello", helloHandler)
-    log.Println("Listing for requests at http://localhost:8000/hello")
+	// Register Routes
+	registerRoutes(handler)
+
+	// Start Http Server
+    log.Println("POOL Backend Server has be started. Listening on http://localhost:8000.")
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
