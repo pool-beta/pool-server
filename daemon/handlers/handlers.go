@@ -16,6 +16,7 @@ type handler struct {
 	*handlerContext
 }
 
+/* Should only be called once */
 func NewHandler() (Handler, error) {
 	hc, err := newHandlerContext()
 	if err != nil {
