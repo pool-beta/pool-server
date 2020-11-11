@@ -2,6 +2,7 @@ package simple
 
 import (
 	puser "github.com/pool-beta/pool-server/user"
+	. "github.com/pool-beta/pool-server/user/types"
 )
 
 /*
@@ -29,5 +30,17 @@ func InitUsers() (Users, error) {
 }
 
 func (us *users) CleanUp() error {
+	return nil
+}
+
+func (us *users) CreateUser() (User, error) {
+	return nil, nil
+}
+
+func (us *users) GetUser(UserID) (User, error) {
+	return nil, nil
+}
+	
+func (us *users) RemoveUser(UserID) error {
 	return nil
 }

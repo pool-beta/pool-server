@@ -13,16 +13,9 @@ type pools struct {
 	pf ppool.PoolFactory
 }
 
+// Implements Pool/Drain/Tank
 type pool struct {
 	pool ppool.Pool
-}
-
-type drain struct {
-	drain ppool.Drain
-}
-
-type tank struct {
-	tank ppool.Tank
 }
 
 func InitPools() (Pools, error) {
@@ -53,8 +46,8 @@ func (ps *pools) CreateDrainPool(user User, name string) (Drain, error) {
 		return nil, err
 	}
 
-	return &drain{
-		drain: d,
+	return &pool{
+		pool: d,
 	}, nil
 }
 
@@ -64,12 +57,17 @@ func (ps *pools) CreateTankPool(user User, name string) (Tank, error) {
 		return nil, err
 	}
 
-	return &tank{
-		tank: t,
+	return &pool{
+		pool: t,
 	}, nil
 }
 
-func (ps *pools) RemovePool(pool Pool) error {
+// Returns the pool with the pid; could be pool, drain, or tank
+func (ps *pools) GetPool(pid PoolID) (Pool, error) {
+	return nil, nil
+}
+
+func (ps *pools) RemovePool(pid PoolID) error {
 	
 	return nil
 }
@@ -81,6 +79,10 @@ func (ps *pools) CleanUp() error {
 // -------------------------------------------------------------------------------------------------
 
 func (p *pool) CreateStream(puller Pool) (Stream, error) {
+	return nil, nil
+}
+
+func (p *pool) GetStream(sid StreamID) (Stream, error) {
 	return nil, nil
 }
 

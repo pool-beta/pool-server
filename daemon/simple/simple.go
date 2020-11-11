@@ -12,17 +12,17 @@ import (
 */
 
 type Simple interface {
-	CleanUp()
-
-	Pools() (Pools, error) // POOL
+	Pools() (Pools, error) // POOL (Pools)
 	Users() (Users, error) // Users
+
+	CleanUp() error
 }
 
 // Simple Users
 type Users interface {
-	NewUser() (User, error)
+	CreateUser() (User, error)
 	GetUser(UserID) (User, error)
-	RemoveUser()
+	RemoveUser(UserID) error
 
 	CleanUp() error
 }
@@ -51,7 +51,7 @@ type Pool interface {
 	CreateStream(Pool) (Stream, error)
 	GetStream(StreamID) (Stream, error)
 
-	NewFlow() Flow
+	CreateFlow() (Flow, error)
 
 	CleanUp() error
 }

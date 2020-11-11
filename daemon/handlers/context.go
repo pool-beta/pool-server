@@ -1,6 +1,8 @@
 package handlers
 
-import ()
+import (
+	"github.com/pool-beta/pool-server/daemon/simple"
+)
 
 /* 
 	HandlerContext contains the api for handling requests with the right context
@@ -15,7 +17,9 @@ type handlerContext struct {
 }
 
 func newHandlerContext() (*handlerContext, error) {
-	return &handlerContext{
+	s := simple.NewSimple()
 
+	return &handlerContext{
+		simple: s,
 	}, nil
 }
