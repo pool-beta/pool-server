@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	. "github.com/pool-beta/pool-server/pool"
-	. "github.com/pool-beta/pool-server/types"
+	. "github.com/pool-beta/pool-server/pool/types"
+	. "github.com/pool-beta/pool-server/user/types"
 )
 
 func TestSinglePoolMethods(t *testing.T) {

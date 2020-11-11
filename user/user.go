@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	. "github.com/pool-beta/pool-server/types"
+	. "github.com/pool-beta/pool-server/user/types"
 )
 
 type UserFactory interface {

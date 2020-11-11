@@ -1,10 +1,8 @@
 package pool
 
-import (
-)
+
 
 /* Stream Slice */
-
 func FindAndRemove(array []Stream, element Stream) ([]Stream, bool) {
 	i, exists := Find(array, element)
 	if !exists {

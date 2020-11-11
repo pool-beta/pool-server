@@ -1,7 +1,7 @@
 package simple
 
 import (
-	"github.com/pool-beta/pool-server/user"
+	puser "github.com/pool-beta/pool-server/user"
 )
 
 /*
@@ -9,12 +9,16 @@ import (
 */
 
 type users struct {
-	uf user.UserFactory
+	uf puser.UserFactory
 }
 
-func NewUsers() (Users, error) {
+type user struct {
+	user puser.User
+}
+
+func InitUsers() (Users, error) {
 	// Start UserFactory
-	uf, err := user.NewUserFactory()
+	uf, err := puser.NewUserFactory()
 	if err != nil {
 		return nil, err
 	}
@@ -22,4 +26,8 @@ func NewUsers() (Users, error) {
 	return &users{
 		uf: uf,
 	}, nil
+}
+
+func (us *users) CleanUp() error {
+	return nil
 }

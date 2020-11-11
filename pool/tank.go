@@ -1,8 +1,9 @@
 package pool
 
 import (
-
 	. "github.com/pool-beta/pool-server/types"
+	. "github.com/pool-beta/pool-server/pool/types"
+	. "github.com/pool-beta/pool-server/user/types"
 )
 
 type Tank interface {

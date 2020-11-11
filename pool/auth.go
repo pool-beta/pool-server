@@ -3,9 +3,10 @@ package pool
 import (
 	"fmt"
 	"sync"
-
-	. "github.com/pool-beta/pool-server/types"
-	"github.com/pool-beta/pool-server/utils"
+	
+	. "github.com/pool-beta/pool-server/pool/types"
+	. "github.com/pool-beta/pool-server/user/types"
+	uutils "github.com/pool-beta/pool-server/user/utils"
 )
 
 type PoolAuth interface {
@@ -49,11 +50,11 @@ func (p *poolAuth) AdminCheck(user UserID, level string) bool {
 	ok := false
 	switch level {
 	case "owner":
-		_, ok = utils.Find(p.owners, user)
+		_, ok = uutils.Find(p.owners, user)
 	case "admin":
-		_, ok = utils.Find(p.admins, user)
+		_, ok = uutils.Find(p.admins, user)
 	case "member":
-		_, ok = utils.Find(p.members, user)
+		_, ok = uutils.Find(p.members, user)
 	}
 	return ok
 }
@@ -74,9 +75,9 @@ func (p *poolAuth) RemoveOwner(user UserID) error {
 
 	// TODO: Validate user
 
-	owners, ok := utils.FindAndRemove(p.owners, user)
+	owners, ok := uutils.FindAndRemove(p.owners, user)
 	if !ok {
-		return fmt.Errorf("User is not an owner of this pool -- userID: %v; poolID: %v", user, p.pid)
+		return fmt.Errorf("User is not an owner of this pool -- UserID: %v; poolID: %v", user, p.pid)
 	}
 	p.owners = owners
 	return nil
@@ -98,9 +99,9 @@ func (p *poolAuth) RemoveAdmin(user UserID) error {
 
 	// TODO: Validate user
 
-	admins, ok := utils.FindAndRemove(p.admins, user)
+	admins, ok := uutils.FindAndRemove(p.admins, user)
 	if !ok {
-		return fmt.Errorf("User is not an admin of this pool -- userID: %v; poolID: %v", user, p.pid)
+		return fmt.Errorf("User is not an admin of this pool -- UserID: %v; poolID: %v", user, p.pid)
 	}
 	p.admins = admins
 	return nil
@@ -122,9 +123,9 @@ func (p *poolAuth) RemoveMember(user UserID) error {
 
 	// TODO: Validate user
 
-	members, ok := utils.FindAndRemove(p.members, user)
+	members, ok := uutils.FindAndRemove(p.members, user)
 	if !ok {
-		return fmt.Errorf("User is not a member of this pool -- userID: %v; poolID: %v", user, p.pid)
+		return fmt.Errorf("User is not a member of this pool -- UserID: %v; poolID: %v", user, p.pid)
 	}
 	p.members = members
 	return nil

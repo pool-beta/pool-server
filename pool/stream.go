@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	. "github.com/pool-beta/pool-server/types"
+	. "github.com/pool-beta/pool-server/user/types"
+	. "github.com/pool-beta/pool-server/pool/types"
 )
 
 /* 

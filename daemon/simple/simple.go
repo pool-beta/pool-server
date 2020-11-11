@@ -1,7 +1,8 @@
 package simple
 
-import (
-
+import (	
+	. "github.com/pool-beta/pool-server/user/types"
+	. "github.com/pool-beta/pool-server/pool/types"
 )
 
 /* 
@@ -11,7 +12,7 @@ import (
 */
 
 type Simple interface {
-	// TODO: Cleanup()
+	CleanUp()
 
 	Pools() (Pools, error) // POOL
 	Users() (Users, error) // Users
@@ -19,32 +20,40 @@ type Simple interface {
 
 // Simple Users
 type Users interface {
-	NewUser()
-	GetUser()
+	NewUser() (User, error)
+	GetUser(UserID) (User, error)
 	RemoveUser()
+
+	CleanUp() error
 }
 
 type User interface {
-	
+	ID() UserID
+	CleanUp() error
 }
 
 type Space interface {
-
+	
 }
 
 // Pools implements POOL (simple pools)
 type Pools interface {
-	NewPool() Pool
-	NewDrainPool() Drain 
-	NewTankPool() Tank
-	RemovePool() error
+	CreatePool(User, string) (Pool, error)
+	CreateDrainPool(User, string) (Drain, error) 
+	CreateTankPool(User, string) (Tank, error)
+	GetPool(PoolID) (Pool, error) 
+	RemovePool(PoolID) error
 
-	NewStream() Stream
-	RemoveStream() error
+	CleanUp() error
 }
 
 type Pool interface {
+	CreateStream(Pool) (Stream, error)
+	GetStream(StreamID) (Stream, error)
+
 	NewFlow() Flow
+
+	CleanUp() error
 }
 
 type Tank interface {
@@ -82,12 +91,12 @@ type simple struct {
 // Start all the necessary Factories
 func NewSimple() (Simple, error) {
 	// TODO: Start/Connect Database
-	users, err := NewUsers()
+	users, err := InitUsers()
 	if err != nil {
 		return nil, err
 	}
 
-	pools, err := NewPools()
+	pools, err := InitPools()
 	if err != nil {
 		return nil, err
 	}
@@ -98,12 +107,25 @@ func NewSimple() (Simple, error) {
 	}, nil
 }
 
-
-
 func (s *simple) Pools() (Pools, error) {
 	return s.pools, nil
 }
 
 func (s *simple) Users() (Users, error) {
 	return s.users, nil
+}
+
+func (s *simple) CleanUp() error {
+	var err error
+
+	err = s.pools.CleanUp()
+	if err != nil {
+		return err
+	}
+
+	err = s.users.CleanUp()
+	if err != nil {
+		return err
+	}
+	return nil
 }
