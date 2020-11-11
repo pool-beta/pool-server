@@ -8,6 +8,7 @@ import (
 )
 
 func Run() {
+	
 	// Start Handlers
 	handler, err := NewHandler()
 	if err != nil {

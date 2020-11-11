@@ -11,7 +11,7 @@ import (
 // PoolFactory contains the API for managing Pools (singleton; manually managed)
 type PoolFactory interface {
 	// Creates a new Pool
-	CreatePool(string, UserID) (Pool, error)
+	CreatePool(string, UserID, PoolType) (Pool, error)
 	RetrievePool(PoolID) (Pool, error)
 	ReturnPool(PoolID) error
 }
@@ -38,13 +38,23 @@ func NewPoolFactory() (PoolFactory, error) {
 	}, nil
 }
 
-func (pf *poolFactory) CreatePool(poolName string, owner UserID) (Pool, error) {
+func (pf *poolFactory) CreatePool(poolName string, owner UserID, poolType PoolType) (Pool, error) {
 	// TODO: Validate owner
 
 	// Create a new pool id
 	pid := NewPoolID()
-
-	pool := initPool(pid, poolName, owner)
+	
+	var pool Pool
+	switch (poolType) {
+	case POOL:
+		pool = initPool(pid, poolName, owner)
+	case DRAIN:
+		pool = newDrain(pid, poolName, owner)
+	case TANK:
+		pool = newTank(pid, poolName, owner)
+	default:
+		return nil, fmt.Errorf("Not a valid PoolType -- poolType: %v", poolType)
+	}
 
 	// Create poolRef
 	pr := &poolRef{
@@ -119,6 +129,14 @@ type pool struct {
 	pullers []Stream
 
 	mutex sync.Mutex
+}
+
+// Wrapper for initPool for PoolType POOL (default type)
+func newPool(pid PoolID, name string, owner UserID) Pool {
+	p := initPool(pid, name, owner)
+	p.reserve = USDollar(0)
+
+	return p
 }
 
 // Used by PoolFactory to init a Pool; error check should be already done

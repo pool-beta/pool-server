@@ -2,12 +2,29 @@ package pool
 
 import (
 
+	. "github.com/pool-beta/pool-server/types"
 )
 
 type Tank interface {
-	Pull(Drop)
+	Pool
 }
 
 type tank struct {
-	
+	*pool
+}
+
+func newTank(pid PoolID, name string, owner UserID) Tank {
+	p := initPool(pid, name, owner)
+	p.reserve = USDollar(0) // never checked
+
+	return &tank{
+		pool: p,
+	}
+}
+
+func (t *tank) Pull(drop Drop) error {
+	// Should allow infinite pulls
+
+	// TODO: log the pull
+	return nil
 }

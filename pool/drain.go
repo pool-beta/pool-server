@@ -20,9 +20,7 @@ type drain struct {
 	*pool
 }
 
-func NewDrain(name string, owner UserID) Drain {
-	pid := NewPoolID()
-
+func newDrain(pid PoolID, name string, owner UserID) Drain {
 	p := initPool(pid, name, owner)
 	p.reserve = USDollar(0)
 

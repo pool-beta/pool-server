@@ -24,11 +24,11 @@ func TestSimpleDrain(t *testing.T) {
 	user1 := NewUserID()
 
 	// Create Pool
-	pool1, err := pf.CreatePool("pool1", user1)
+	pool1, err := pf.CreatePool("pool1", user1, POOL)
 	pool1.Fund(initialAmount)
 
 	// Create Debit Drain
-	debit1 := NewDrain("debit1", user1)
+	debit1, err := pf.CreatePool("debit1", user1, DRAIN)
 
 	// Connect Pool & Drain
 	stream1, err := NewStream(user1, pool1, debit1)
@@ -58,8 +58,14 @@ func TestSimpleDrain(t *testing.T) {
 func TestDrainInvalidMethods(t *testing.T) {
 	var err error
 
+	// Init PoolFactory
+	pf := initPoolFactory()
+	if pf == nil {
+		t.Errorf("Error in creating PoolFactory")
+	}
+
 	user1 := NewUserID()
-	drain1 := NewDrain("drain1", user1)
+	drain1, err := pf.CreatePool("drain1", user1, DRAIN)
 
 	err = drain1.Push(nil)
 	if err == nil {

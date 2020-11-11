@@ -8,6 +8,16 @@ type PoolID = uint64
 type StreamID = uint64
 type UserID = uint64
 
+/* PoolType */
+type PoolType uint8
+const (
+	UNKNOWN PoolType = iota
+	POOL
+	TANK
+	DRAIN
+	// GROUP 
+)
+
 /* USDollar */
 type USDollar uint64
 
