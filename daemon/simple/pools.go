@@ -90,7 +90,11 @@ func (p *pool) RemoveStream(sid StreamID) error {
 	return nil
 }
 
-func (p *pool) CreateFlow() (Flow, error) {
+func (p *pool) CreatePullFlow() (Flow, error) {
+	return nil, nil
+}
+
+func (p *pool) CreatePushFlow() (Flow, error) {
 	return nil, nil
 }
 

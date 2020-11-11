@@ -29,9 +29,17 @@ type Users interface {
 
 type User interface {
 	ID() UserID
+
+	Tanks()
+	Pools()
+	Drains()
+	Flows()
+
 	CleanUp() error
 }
 
+// TODO: A Space would correspond to a user's network
+// Possibly needed to scale
 type Space interface {
 	
 }
@@ -51,7 +59,8 @@ type Pool interface {
 	CreateStream(Pool) (Stream, error)
 	GetStream(StreamID) (Stream, error)
 
-	CreateFlow() (Flow, error)
+	CreatePushFlow() (Flow, error)
+	CreatePullFlow() (Flow, error)
 
 	CleanUp() error
 }
@@ -79,6 +88,16 @@ type Flow interface {
 	Accept()
 	Decline()
 }
+
+type FlowID = uint64
+
+type FlowType uint8
+const (
+	NOFLOW FlowType = iota
+	PULL
+	PUSH
+)
+
 
 // -----------------------------------------------------------------------------------------------------
 
