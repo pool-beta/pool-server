@@ -60,17 +60,17 @@ func TestSimpleNetwork(t *testing.T) {
 	// Check pool reserve
 	reserve = pool1.GetReserve()
 	if reserve != expectedAmount {
-		t.Errorf("Does not match -- expected: %v; actual: %v", expectedAmount.String(), reserve.String())
+		t.Errorf("Does not match pool -- expected: %v; actual: %v", expectedAmount.String(), reserve.String())
 	}
 
 	reserve = debit1.GetReserve()
 	if reserve != expectedAmount {
-		t.Errorf("Does not match -- expected: %v; actual: %v", expectedAmount.String(), reserve.String())
+		t.Errorf("Does not match debit -- expected: %v; actual: %v", expectedAmount.String(), reserve.String())
 	}
 
 	reserve = tank1.GetReserve()
 	if reserve != expectedAmount {
-		t.Errorf("Does not match -- expected: %v; actual: %v", expectedAmount.String(), reserve.String())
+		t.Errorf("Does not match tank -- expected: %v; actual: %v", expectedAmount.String(), reserve.String())
 	}
 
 }

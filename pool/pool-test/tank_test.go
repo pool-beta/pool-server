@@ -30,10 +30,10 @@ func TestSimpleTank(t *testing.T) {
 	// Create Pool
 	pool1, err := pf.CreatePool("pool1", user1, POOL)
 
-	// Create tank
+	// Create Tank
 	tank1, err := pf.CreatePool("tank1", user1, TANK)
 
-	// Connect Pool & Drain
+	// Connect Pool & Tank
 	stream1, err := NewStream(user1, tank1, pool1)
 	stream1.SetAllowOverdraft(true)
 	stream1.SetMaxOverdraft(USDollar(2500))

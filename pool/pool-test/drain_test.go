@@ -56,12 +56,13 @@ func TestSimpleDrain(t *testing.T) {
 	}
 
 	// Test Decline
-	flow1.Decline()
+	flow1.Accept()
 
 	// Check pool reserve
-	reserve = pool1.GetReserve()
-	if reserve != initialAmount {
-		t.Errorf("Does not match -- expected: %v; actual: %v", initialAmount.String(), reserve.String())
+	reserve = debit1.GetReserve()
+	expected := USDollar(0)
+	if reserve != expected {
+		t.Errorf("Does not match -- expected: %v; actual: %v", expected.String(), reserve.String())
 	}
 }
 

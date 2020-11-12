@@ -10,7 +10,7 @@ import (
 
 /* 
 	Drain is pool with no reserve, and cannot push
-	It can only pull, and implements the debit card
+	It implements the POOL debit card
 */
 
 type Drain interface {
@@ -32,5 +32,34 @@ func newDrain(pid PoolID, name string, owner UserID) Drain {
 }
 
 func (d *drain) Push(flow Flow) error {
-	return fmt.Errorf("Can't push from a drain -- drop: %v", flow)
+	if flow != nil {
+		flow.Invalid()
+	}
+
+	return fmt.Errorf("A drain cannot push")
+}
+
+func (d *drain) Pull(flow Flow) error {
+	err := d.PullDrop(flow.PullDrop(), false)
+	if err != nil {
+		flow.Invalid()
+		return err
+	}
+
+	// Initiate Push if necessary
+	err = d.PushDrop(flow.PushDrop(), true)
+	if err != nil {
+		flow.Invalid()
+		return err
+	}
+
+	flow.Valid()
+	return nil
+}
+
+func (d *drain) PushDrop(drop Drop, useReserve bool) error {
+	// drain does not keep a reserve
+	// Accept all pushes
+	drop.AddWithheld(USDollar(0))
+	return nil
 }

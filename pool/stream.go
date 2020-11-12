@@ -63,8 +63,8 @@ func (s *stream) Pull(amount USDollar) (Drop, error) {
 }
 
 func (s *stream) Push(amount USDollar) (Drop, error) {
-	_ = newDrop(s.pushPool, amount)
-	return nil, nil
+	drop := newDrop(s.pushPool, amount)
+	return drop, s.pushPool.PushDrop(drop, true)
 }
 
 func (s *stream) StreamID() StreamID {
