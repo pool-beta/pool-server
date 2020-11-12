@@ -2,7 +2,11 @@ package handlers
 
 import (
 	"io"
+	"fmt"
 	"net/http"
+	"encoding/json"
+	
+	. "github.com/pool-beta/pool-server/daemon/handlers/models"
 )
 
 type Handler interface {
@@ -10,6 +14,10 @@ type Handler interface {
 
 	// Test Handlers
 	TestHandler(http.ResponseWriter, *http.Request)
+
+	// Users
+	CreateUser(http.ResponseWriter, *http.Request)
+	GetUsers(http.ResponseWriter, *http.Request)
 }
 
 type handler struct {
@@ -29,5 +37,13 @@ func NewHandler() (Handler, error) {
 }
 
 func (h *handler) TestHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Welcome to POOL\n")
+	var test Test
+
+	err := json.NewDecoder(req.Body).Decode(&test)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+	}
+
+	io.WriteString(w, fmt.Sprintf("Welcome to POOL\ntest: %v\n", test.Test))
 }

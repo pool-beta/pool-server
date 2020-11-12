@@ -12,6 +12,9 @@ type UserAuth interface {
 	CreateUser(UserName, string) (UserID, error)
 	GetUser(UserName, string) (UserID, error)
 	DeleteUser(UserName, string) error
+
+	// Testing
+	GetAllUserNames() ([]UserName, error)
 }
 
 type userAuth struct {
@@ -70,6 +73,15 @@ func (ua *userAuth) DeleteUser(userName UserName, password string) error {
 	delete(ua.passwords, userName)
 	delete(ua.ids, userName)
 	return nil
+}
+
+func (ua *userAuth) GetAllUserNames() ([]UserName, error) {
+	userNames := make([]UserName, 0)
+
+	for n, _ := range ua.ids {
+		userNames = append(userNames, n)
+	}
+	return userNames, nil
 }
 
 func (ua *userAuth) validateUserPassword(userName UserName, password string) error {

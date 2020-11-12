@@ -7,5 +7,10 @@ import (
 )
 
 func registerRoutes(handler Handler) {
-	http.HandleFunc("/test", handler.TestHandler)
+	// POOL
+	http.HandleFunc("/", handler.TestHandler)
+
+	// User Routes
+	http.HandleFunc("/users", handler.GetUsers)
+	http.HandleFunc("/users/create", handler.CreateUser)
 }

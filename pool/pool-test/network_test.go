@@ -163,5 +163,4 @@ func TestEasyNetwork(t *testing.T) {
 	if reserve != expectedAmount {
 		t.Errorf("Does not match tank -- expected: %v; actual: %v", expectedAmount.String(), reserve.String())
 	}
-
 }

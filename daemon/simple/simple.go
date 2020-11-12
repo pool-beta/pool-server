@@ -3,6 +3,7 @@ package simple
 import (	
 	. "github.com/pool-beta/pool-server/user/types"
 	. "github.com/pool-beta/pool-server/pool/types"
+	. "github.com/pool-beta/pool-server/types"
 )
 
 /* 
@@ -20,20 +21,24 @@ type Simple interface {
 
 // Simple Users
 type Users interface {
-	CreateUser() (User, error)
-	GetUser(UserID) (User, error)
-	RemoveUser(UserID) error
+	CreateUser(UserName, string, USDollar) (User, error)
+	GetUser(UserName, string) (User, error)
+	RemoveUser(UserName, string) error
 
 	CleanUp() error
+
+	// Testing
+	GetAllUserNames() ([]UserName, error)
 }
 
 type User interface {
 	ID() UserID
+	UserName() UserName
 
-	Tanks()
-	Pools()
-	Drains()
-	Flows()
+	Tanks() []Tank
+	Pools() []Pool
+	Drains() []Drain
+	Flows() []Flow
 
 	CleanUp() error
 }

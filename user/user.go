@@ -12,6 +12,10 @@ type UserFactory interface {
 	CreateUser(UserName, string, USDollar) (User, error)
 	RetrieveUser(UserName, string) (User, error)
 	ReturnUser(UserID) error
+	RemoveUser(UserName, string) error
+
+	// Testing
+	RetreieveAllUserNames() ([]UserName, error)
 }
 
 type userRef struct {
@@ -26,8 +30,15 @@ type userFactory struct {
 }
 
 func InitUserFactory() (UserFactory, error) {
+	// Init UserAuth
+	userAuth, err := initUserAuth()
+	if err != nil {
+		return nil, err
+	}
+
 	users := make(map[UserID]*userRef)
 	return &userFactory{
+		userAuth: userAuth,
 		users: users,
 	}, nil
 }
@@ -85,9 +96,21 @@ func (uf *userFactory) ReturnUser(uid UserID) error {
 	return nil
 }
 
+func (uf *userFactory) RemoveUser(userName UserName, password string) error {
+	return uf.userAuth.DeleteUser(userName, password)
+}
+
+
+func (uf *userFactory) RetreieveAllUserNames() ([]UserName, error) {
+	return uf.userAuth.GetAllUserNames()
+}
+
+
 // -----------------------------------------------------------------------------------------------------------
 
 type User interface {
+	GetID() UserID
+	GetUserName() UserName
 	// Returns the current amount in the reserve
 	GetReserve() USDollar
 	// Puts money into the user's reserve
@@ -108,6 +131,20 @@ func initUser(id UserID, name string, amount USDollar) *user {
 		name: name,
 		reserve: amount,
 	}
+}
+
+func (u *user) GetID() UserID {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	return u.id
+}
+
+func (u *user) GetUserName() UserName {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	return u.name
 }
 
 func (u *user) GetReserve() USDollar {
