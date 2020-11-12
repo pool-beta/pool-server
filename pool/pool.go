@@ -235,7 +235,6 @@ func (p *pool) PushDrop(drop Drop, useReserve bool) error {
 		}
 	}
 	
-	// TODO: Add logic for further push
 	return p.push(drop, amount)
 }
 

@@ -30,6 +30,13 @@ func TestUSDollar(t *testing.T) {
 	}
 
 	fmt.Printf("Max USDollar: %v\n", MAXUSDOLLAR.String())
+
+	d1, _ := NewUSDollar(1, 0)
+	d2, _ := NewUSDollar(1, 0)
+
+	if d1 != d2 {
+		t.Errorf("Same amounts are not equal -- d1: %v; d2: %v;", d1.String(), d2.String())
+	}
 }
 
 func TestPercent(t *testing.T) {
