@@ -55,6 +55,7 @@ func TestSimpleDrain(t *testing.T) {
 		t.Errorf("Does not match -- expected: %v; actual: %v", expectedAmount.String(), reserve.String())
 	}
 
+	// Test Decline
 	flow1.Decline()
 
 	// Check pool reserve

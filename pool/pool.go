@@ -162,6 +162,7 @@ func initPool(id PoolID, name string, owner UserID) *pool {
 		id: id,
 		name: name,
 		reserve: USDollar(0), // Always start with zero
+		maxReserve: MAXUSDOLLAR,
 
 		pushers: pushers,
 		pullers: pullers,

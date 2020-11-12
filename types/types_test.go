@@ -28,6 +28,8 @@ func TestUSDollar(t *testing.T) {
 	if err == nil {
 		t.Errorf("Should not allow more than 99 cents")
 	}
+
+	fmt.Printf("Max USDollar: %v\n", MAXUSDOLLAR.String())
 }
 
 func TestPercent(t *testing.T) {

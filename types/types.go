@@ -2,10 +2,12 @@ package types
 
 import (
 	"fmt"
+	"math"
 )
 
 /* USDollar */
 type USDollar uint64
+var MAXUSDOLLAR = maxUSDollar()
 
 func NewUSDollar(dollar int, cent int) (USDollar, error) {
 	if dollar < 0 || cent < 0 {
@@ -18,6 +20,10 @@ func NewUSDollar(dollar int, cent int) (USDollar, error) {
 	d := USDollar(dollar) * USDollar(100)
 	c := USDollar(cent)
 	return d + c, nil
+}
+
+func maxUSDollar() USDollar {
+	return USDollar(math.MaxUint64)
 }
 
 func (us *USDollar) String() string {
