@@ -2,6 +2,7 @@ package simple
 
 import (
 	"math/rand"
+	. "github.com/pool-beta/pool-server/pool/types"
 )
 
 /*
@@ -14,7 +15,7 @@ import (
 */
 
 type flow struct {
-
+	id FlowID
 }
 
 func NewFlowID() FlowID {

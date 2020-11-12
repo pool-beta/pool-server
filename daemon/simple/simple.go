@@ -89,16 +89,6 @@ type Flow interface {
 	Decline()
 }
 
-type FlowID = uint64
-
-type FlowType uint8
-const (
-	NOFLOW FlowType = iota
-	PULL
-	PUSH
-)
-
-
 // -----------------------------------------------------------------------------------------------------
 
 type simple struct {

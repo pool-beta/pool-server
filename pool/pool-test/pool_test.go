@@ -49,7 +49,7 @@ func TestSinglePoolMethods(t *testing.T) {
 }
 
 func initPoolFactory() PoolFactory {
-	poolFactory, err := NewPoolFactory()
+	poolFactory, err := InitPoolFactory()
 	if err != nil {
 		return nil
 	}

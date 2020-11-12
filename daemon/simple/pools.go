@@ -19,7 +19,7 @@ type pool struct {
 }
 
 func InitPools() (Pools, error) {
-	pf, err := ppool.NewPoolFactory()
+	pf, err := ppool.InitPoolFactory()
 	if err != nil {
 		return nil, err
 	}

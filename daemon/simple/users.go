@@ -19,7 +19,7 @@ type user struct {
 
 func InitUsers() (Users, error) {
 	// Start UserFactory
-	uf, err := puser.NewUserFactory()
+	uf, err := puser.InitUserFactory()
 	if err != nil {
 		return nil, err
 	}

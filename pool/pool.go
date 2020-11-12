@@ -32,7 +32,7 @@ type poolRef struct {
 }
 
 // TODO: Database would be inserted into PoolFactory
-func NewPoolFactory() (PoolFactory, error) {
+func InitPoolFactory() (PoolFactory, error) {
 	pools := make(map[PoolID]*poolRef)
 
 	return &poolFactory{
@@ -49,7 +49,7 @@ func (pf *poolFactory) CreatePool(poolName string, owner UserID, poolType PoolTy
 	var pool Pool
 	switch (poolType) {
 	case POOL:
-		pool = initPool(pid, poolName, owner)
+		pool = newPool(pid, poolName, owner)
 	case DRAIN:
 		pool = newDrain(pid, poolName, owner)
 	case TANK:
@@ -106,16 +106,20 @@ type Pool interface {
 	// Getters
 	GetReserve() USDollar
 
-	// Drop Control
+	// Stream Control
 	AddPusher(Stream) error
 	RemovePusher(Stream) error
 	AddPuller(Stream) error
 	RemovePuller(Stream) error
 
+	// Flow
+	Pull(Flow) error
+	Push(Flow) error
+	// Reset() error // (?)
+
 	// Drop
-	Pull(Drop) error
-	Push(Drop) error
-	Reset() error // (?)
+	PullDrop(Drop, bool) error
+	PushDrop(Drop, bool) error
 
 	// For Tests
 	Fund(USDollar) USDollar
@@ -126,6 +130,7 @@ type pool struct {
 	id PoolID
 	name string
 	reserve USDollar
+	maxReserve USDollar
 
 	pushers []Stream
 	pullers []Stream
@@ -167,29 +172,97 @@ func initPool(id PoolID, name string, owner UserID) *pool {
 
 // Triggers
 
-// Add to this pool
-func (p *pool) Push(drop Drop) error {
+// Flow
+func (p *pool) Push(flow Flow) error {
+	// Pull the required money first
+	err := p.PullDrop(flow.PullDrop(), true)
+	if err != nil {
+		flow.Invalid()
+		return err
+	}
+
+	err = p.PushDrop(flow.PushDrop(), false)
+	if err != nil {
+		flow.Invalid()
+		return err
+	}
+
+	flow.Valid()
 	return nil
 }
 
-// Take from this pool
-func (p *pool) Pull(drop Drop) error {
+func (p *pool) Pull(flow Flow) error {
+	err := p.PullDrop(flow.PullDrop(), false)
+	if err != nil {
+		flow.Invalid()
+		return err
+	}
+
+	// Initiate Push if necessary
+	err = p.PushDrop(flow.PushDrop(), true)
+	if err != nil {
+		flow.Invalid()
+		return err
+	}
+
+	flow.Valid()
+	return nil
+}
+
+
+// Add to this pool
+// useReserve refers to putting the drop into this pool's reserve first
+func (p *pool) PushDrop(drop Drop, useReserve bool) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
 	amount := drop.Amount()
-	if amount > p.reserve {
-		// Take max from reserve
-		diff := amount - p.reserve
-		p.reserve = 0
+	if useReserve {
+		// Change drop amount if needed
+		total := amount + p.reserve
+		if total > p.maxReserve {
+			// add max
+			diff := p.maxReserve - p.reserve
+			drop.AddWithheld(diff)
 
-		// Pull from pullers
-		return p.pull(drop, diff)
-	} else {
-		// Easy -- take from reserve
-		p.reserve -= amount
-		return nil
+			amount = amount - diff
+			// Give rest to children
+		} else {
+			// Easy -- leave all here
+			drop.AddWithheld(amount)
+			return nil
+		}
 	}
+	
+	// TODO: Add logic for further push
+	return p.push(drop, amount)
+}
+
+// Take from this pool
+// useReserve refers to pulling from this pool's reserve first
+func (p *pool) PullDrop(drop Drop, useReserve bool) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	amount := drop.Amount()
+	if useReserve {
+		if amount > p.reserve {
+			// Take max from reserve
+			r := p.reserve
+			p.reserve = 0
+	
+			drop.AddWithheld(r)
+			amount = amount - r
+	
+			// Go on
+		} else {
+			// Easy -- take from reserve
+			p.reserve -= amount
+			drop.AddWithheld(amount)
+			return nil
+		}
+	}
+	return p.pull(drop, amount)
 }
 
 func (p *pool) Reset() error {
@@ -246,7 +319,7 @@ func (p *pool) RemovePuller(stream Stream) error {
 
 // Getters
 func (p *pool) GetReserve() USDollar {
-	return p.Fund(USDollar(0))
+	return p.reserve
 }
 
 // For tesing
@@ -281,6 +354,12 @@ func (p *pool) pull(drop Drop, amount USDollar) error {
 		drop.AddDroplet(d)
 	}
 	
+	return nil
+}
+
+// Push to pullers
+func (p *pool) push(drop Drop, amount USDollar) error {
+	// TODO: Add push logic
 	return nil
 }
 

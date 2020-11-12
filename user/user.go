@@ -9,8 +9,8 @@ import (
 )
 
 type UserFactory interface {
-	CreateUser(string, USDollar) (User, error)
-	RetrieveUser(UserID) (User, error)
+	CreateUser(UserName, string, USDollar) (User, error)
+	RetrieveUser(UserName, string) (User, error)
 	ReturnUser(UserID) error
 }
 
@@ -21,19 +21,23 @@ type userRef struct {
 }
 
 type userFactory struct {
+	userAuth UserAuth
 	users map[UserID]*userRef
 }
 
-func NewUserFactory() (UserFactory, error) {
+func InitUserFactory() (UserFactory, error) {
 	users := make(map[UserID]*userRef)
 	return &userFactory{
 		users: users,
 	}, nil
 }
 
-func (uf *userFactory) CreateUser(userName string, amount USDollar) (User, error) {
-	// Create a new user id
-	uid := NewUserID()
+func (uf *userFactory) CreateUser(userName UserName, password string, amount USDollar) (User, error) {
+	// Create a new user id thru userAuth
+	uid, err := uf.userAuth.CreateUser(userName, password)
+	if err != nil {
+		return nil, err
+	}
 
 	user := initUser(uid, userName, amount)
 
@@ -47,10 +51,16 @@ func (uf *userFactory) CreateUser(userName string, amount USDollar) (User, error
 	return user, nil
 }
 
-func (uf *userFactory) RetrieveUser(uid UserID) (User, error) {
+func (uf *userFactory) RetrieveUser(userName UserName, password string) (User, error) {
+	// Get uid thru userAuth
+	uid, err := uf.userAuth.GetUser(userName, password)
+	if err != nil {
+		return nil, err
+	}
+
 	ur, ok := uf.users[uid]
 	if !ok {
-		return nil, fmt.Errorf("User does not exist -- user: %v", uid)
+		return nil, fmt.Errorf("User does not exist -- username: %v", userName)
 	}
 
 	ur.mutex.Lock()

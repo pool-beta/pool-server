@@ -17,11 +17,12 @@ import (
 type Drop interface {
 	// Getters
 	Amount() USDollar
-
-	// Accept the drop; follow thru
+	// Absorb the amount of drop
 	Absorb()
-	// Reject the drop; return the previous state
-	Reject()
+	// Discard the amount of drop
+	Discard()
+	// Adds the amount withheld from pool
+	AddWithheld(USDollar)
 	// Add a drop to the list of droplets
 	AddDroplet(Drop)
 }
@@ -31,10 +32,11 @@ type drop struct {
 	pool Pool
 	amount USDollar
 
+	withheld USDollar
 	droplets []Drop
 }
 
-func NewDrop(pool Pool, amount USDollar) Drop {
+func newDrop(pool Pool, amount USDollar) Drop {
 	droplets := make([]Drop, 0)
 
 	return &drop{
@@ -44,27 +46,32 @@ func NewDrop(pool Pool, amount USDollar) Drop {
 	}
 }
 
+func (d *drop) AddWithheld(amount USDollar) {
+	d.withheld = amount
+}
+
 func (d *drop) AddDroplet(drop Drop) {
 	d.droplets = append(d.droplets, drop)
 }
 
+// Add the drop amount into the pool
 func (d *drop) Absorb() {
 	// Absorb Droplets first
 	for _, dlets := range d.droplets {
 		dlets.Absorb()
 	}
 
-	// Do nothing (?); maybe log it
+	d.pool.Fund(d.withheld)
 }
 
-func (d *drop) Reject() {
+// Discard the drop
+func (d *drop) Discard() {
 	// Reject Droplets first
 	for _, dlets := range d.droplets {
-		dlets.Reject()
+		dlets.Discard()
 	}
 
-	// Return to previous state
-
+	// Discard so do nothing; maybe log
 }
 
 // Getters

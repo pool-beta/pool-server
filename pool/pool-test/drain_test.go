@@ -42,18 +42,25 @@ func TestSimpleDrain(t *testing.T) {
 		t.Errorf("Error in NewStream -- pool1: %v; pool2: %v; user: %v", pool1, debit1, user1)
 	}
 
-	// Pull Drop
-	drop1 := NewDrop(debit1, pullAmount)
-	err = debit1.Pull(drop1)
+	// Pull on debit
+	flow1, err := NewFlow(debit1, pullAmount, PULL)
 	if err != nil {
 		fmt.Println(err.Error())
-		t.Errorf("Error in drain pull -- drain: %v; drop: %v", debit1, drop1)
+		t.Errorf("Error in drain pull -- drain: %v; drop: %v", debit1, flow1)
 	}
 
 	// Check pool reserve
 	reserve := pool1.GetReserve()
 	if reserve != expectedAmount {
 		t.Errorf("Does not match -- expected: %v; actual: %v", expectedAmount.String(), reserve.String())
+	}
+
+	flow1.Decline()
+
+	// Check pool reserve
+	reserve = pool1.GetReserve()
+	if reserve != initialAmount {
+		t.Errorf("Does not match -- expected: %v; actual: %v", initialAmount.String(), reserve.String())
 	}
 }
 

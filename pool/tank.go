@@ -23,7 +23,7 @@ func newTank(pid PoolID, name string, owner UserID) Tank {
 	}
 }
 
-func (t *tank) Pull(drop Drop) error {
+func (t *tank) PullDrop(drop Drop, useReserve bool) error {
 	// Should allow infinite pulls
 
 	// TODO: log the pull

@@ -58,12 +58,12 @@ func NewStream(owner UserID, pullPool Pool, pushPool Pool) (Stream, error) {
 }
 
 func (s *stream) Pull(amount USDollar) (Drop, error) {
-	drop := NewDrop(s.pullPool, amount)
-	return drop, s.pullPool.Pull(drop)
+	drop := newDrop(s.pullPool, amount)
+	return drop, s.pullPool.PullDrop(drop, true)
 }
 
 func (s *stream) Push(amount USDollar) (Drop, error) {
-	_ = NewDrop(s.pushPool, amount)
+	_ = newDrop(s.pushPool, amount)
 	return nil, nil
 }
 
@@ -93,6 +93,17 @@ type StreamConfig interface {
 
 	GetMinOverdraft() USDollar
 	SetMinOverdraft(USDollar)
+
+	// Push Config
+	GetAllowPush() bool
+	SetAllowPush(bool)
+
+	GetPercentPush() Percent
+	SetPercentPush(Percent)
+
+	// GetMaxPush() USDollar
+	// SetMaxPush(USDollar)
+
 }
 
 type streamConfig struct {
@@ -102,6 +113,10 @@ type streamConfig struct {
 	percentOverdraft Percent
 	maxOverdraft USDollar
 	minOverdraft USDollar // TODO: Not Fully Supported
+
+	// Push Config
+	allowPush bool
+	percentPush Percent
 }
 
 func newStreamConfig() *streamConfig {
@@ -110,9 +125,14 @@ func newStreamConfig() *streamConfig {
 		allowFlexibleOverdraft: false,
 		percentOverdraft: NewPercent(0, 1),
 		maxOverdraft: USDollar(0),
-		minOverdraft: USDollar(0),		
+		minOverdraft: USDollar(0),
+
+		allowPush: false,
+		percentPush: NewPercent(0, 1),
 	}
 }
+
+// Pull Configs
 
 func (c *streamConfig) GetAllowOverdraft() bool {
 	return c.allowOverdraft
@@ -152,4 +172,22 @@ func (c *streamConfig) GetMinOverdraft() USDollar {
 
 func (c *streamConfig) SetMinOverdraft(min USDollar) {
 	c.minOverdraft = min
+}
+
+// Push Configs
+
+func (c *streamConfig) GetAllowPush() bool {
+	return c.allowPush
+}
+
+func (c *streamConfig) SetAllowPush(value bool) {
+	c.allowPush = value
+}
+
+func (c *streamConfig) GetPercentPush() Percent {
+	return c.percentPush
+}
+
+func (c *streamConfig) SetPercentPush(percent Percent) {
+	c.percentPush = percent
 }

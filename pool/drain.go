@@ -31,6 +31,6 @@ func newDrain(pid PoolID, name string, owner UserID) Drain {
 	}
 }
 
-func (d *drain) Push(drop Drop) error {
-	return fmt.Errorf("Can't push from a drain -- drop: %v", drop)
+func (d *drain) Push(flow Flow) error {
+	return fmt.Errorf("Can't push from a drain -- drop: %v", flow)
 }

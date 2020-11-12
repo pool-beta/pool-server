@@ -10,3 +10,5 @@ func NewUserID() UserID {
 	r := rand.Uint64()
 	return r
 }
+
+type UserName = string
