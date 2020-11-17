@@ -7,14 +7,9 @@ import (
 	"github.com/pool-beta/pool-server/daemon/handlers/models"
 )
 
+// Creates a new user
 func (h *handler) CreateUser(w http.ResponseWriter, req *http.Request) {
-	simple, err := h.Simple()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	usrs, err := simple.Users()
+	usrs, err := h.users()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -24,50 +19,77 @@ func (h *handler) CreateUser(w http.ResponseWriter, req *http.Request) {
 	err = json.NewDecoder(req.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-        return
+		return
 	}
 
 	user, err := usrs.CreateUser(request.UserName, request.Password, 0)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-        return
+		return
 	}
 
 	response := &models.ResponseCreateUser{
 		UserName: user.UserName(),
-		UserID: user.ID(),
+		UserID:   user.ID(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
+// Returns all users
 func (h *handler) GetUsers(w http.ResponseWriter, req *http.Request) {
-	simple, err := h.Simple()
+	usrs, err := h.users()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	usrs, err := simple.Users()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	allUserNames, err := usrs.GetAllUserNames()
 
-	userNames, err := usrs.GetAllUserNames()
-
-	resp := make([]models.User, 0)
-	for i := 0; i < len(userNames); i++ {
-		resp = append(resp, models.User{
-			UserName: userNames[i],
+	userNames := make([]models.UserName, 0)
+	for i := 0; i < len(allUserNames); i++ {
+		userNames = append(userNames, models.UserName{
+			UserName: allUserNames[i],
 		})
 	}
-	
-	users := models.Users{
-		Users: resp,
+
+	resp := models.ResponseGetUsers{
+		UserNames: userNames,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	json.NewEncoder(w).Encode(resp)
+}
+
+/* User Specific Handlers */
+
+// Creates a new tank for the User
+func (h *handler) CreateTank(http.ResponseWriter, *http.Request) {
+
+}
+
+// Creates a new pool for the user
+func (h *handler) CreatePool(http.ResponseWriter, *http.Request) {
+
+}
+
+// Creates a new drain for the user
+func (h *handler) CreateDrain(http.ResponseWriter, *http.Request) {
+
+}
+
+// Returns all tanks owned by user
+func (h *handler) GetTanks(http.ResponseWriter, *http.Request) {
+
+}
+
+// Returns all pools owned by user
+func (h *handler) GetPools(http.ResponseWriter, *http.Request) {
+
+}
+
+// Returns all drains owned by user
+func (h *handler) GetDrains(http.ResponseWriter, *http.Request) {
+
 }

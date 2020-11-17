@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"io"
-	"fmt"
-	"net/http"
 	"encoding/json"
-	
+	"fmt"
+	"io"
+	"net/http"
+
 	. "github.com/pool-beta/pool-server/daemon/handlers/models"
 )
 
@@ -18,6 +18,15 @@ type Handler interface {
 	// Users
 	CreateUser(http.ResponseWriter, *http.Request)
 	GetUsers(http.ResponseWriter, *http.Request)
+
+	// User
+	CreateTank(http.ResponseWriter, *http.Request)
+	CreatePool(http.ResponseWriter, *http.Request)
+	CreateDrain(http.ResponseWriter, *http.Request)
+
+	GetTanks(http.ResponseWriter, *http.Request)
+	GetPools(http.ResponseWriter, *http.Request)
+	GetDrains(http.ResponseWriter, *http.Request)
 }
 
 type handler struct {
@@ -42,7 +51,7 @@ func (h *handler) TestHandler(w http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&test)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-        return
+		return
 	}
 
 	io.WriteString(w, fmt.Sprintf("Welcome to POOL\ntest: %v\n", test.Test))

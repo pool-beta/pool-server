@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"sync"
 
-	. "github.com/pool-beta/pool-server/types"
 	. "github.com/pool-beta/pool-server/pool/types"
+	. "github.com/pool-beta/pool-server/types"
 	. "github.com/pool-beta/pool-server/user/types"
 )
-
 
 // PoolFactory contains the API for managing Pools (singleton; manually managed)
 type PoolFactory interface {
@@ -26,9 +25,9 @@ type poolFactory struct {
 // Interal struct for PoolFactory to keep track of active Pools
 // TODO: Flushing mechanism of some sort
 type poolRef struct {
-	pool Pool
+	pool     Pool
 	refCount int
-	mutex sync.Mutex
+	mutex    sync.Mutex
 }
 
 // TODO: Database would be inserted into PoolFactory
@@ -45,9 +44,9 @@ func (pf *poolFactory) CreatePool(poolName string, owner UserID, poolType PoolTy
 
 	// Create a new pool id
 	pid := NewPoolID()
-	
+
 	var pool Pool
-	switch (poolType) {
+	switch poolType {
 	case POOL:
 		pool = newPool(pid, poolName, owner)
 	case DRAIN:
@@ -60,7 +59,7 @@ func (pf *poolFactory) CreatePool(poolName string, owner UserID, poolType PoolTy
 
 	// Create poolRef
 	pr := &poolRef{
-		pool: pool,
+		pool:     pool,
 		refCount: 1,
 	}
 
@@ -96,7 +95,6 @@ func (pf *poolFactory) ReturnPool(pid PoolID) error {
 	return nil
 }
 
-
 //--------------------------------------------------------------------------------------------------
 
 type Pool interface {
@@ -104,6 +102,7 @@ type Pool interface {
 	PoolAuth
 
 	// Getters
+	GetID() PoolID
 	GetReserve() USDollar
 
 	// Stream Control
@@ -127,9 +126,9 @@ type Pool interface {
 
 type pool struct {
 	*poolAuth
-	id PoolID
-	name string
-	reserve USDollar
+	id         PoolID
+	name       string
+	reserve    USDollar
 	maxReserve USDollar
 
 	pushers []Stream
@@ -158,10 +157,10 @@ func initPool(id PoolID, name string, owner UserID) *pool {
 	// Add Original Owner
 	auth.AddOwner(owner)
 
-	return &pool {
-		id: id,
-		name: name,
-		reserve: USDollar(0), // Always start with zero
+	return &pool{
+		id:         id,
+		name:       name,
+		reserve:    USDollar(0), // Always start with zero
 		maxReserve: MAXUSDOLLAR,
 
 		pushers: pushers,
@@ -210,7 +209,6 @@ func (p *pool) Pull(flow Flow) error {
 	return nil
 }
 
-
 // Add to this pool
 // useReserve refers to putting the drop into this pool's reserve first
 func (p *pool) PushDrop(drop Drop, useReserve bool) error {
@@ -234,7 +232,7 @@ func (p *pool) PushDrop(drop Drop, useReserve bool) error {
 			return nil
 		}
 	}
-	
+
 	return p.push(drop, amount)
 }
 
@@ -250,10 +248,10 @@ func (p *pool) PullDrop(drop Drop, useReserve bool) error {
 			// Take max from reserve
 			r := p.reserve
 			p.reserve = 0
-	
+
 			drop.AddWithheld(r)
 			amount = amount - r
-	
+
 			// Go on
 		} else {
 			// Easy -- take from reserve
@@ -275,7 +273,7 @@ func (p *pool) AddPusher(stream Stream) error {
 
 	// TODO: Validate user
 
-	p.pushers = append(p.pushers, stream) 
+	p.pushers = append(p.pushers, stream)
 	return nil
 }
 
@@ -299,7 +297,7 @@ func (p *pool) AddPuller(stream Stream) error {
 
 	// TODO: Validate user
 
-	p.pullers = append(p.pullers, stream) 
+	p.pullers = append(p.pullers, stream)
 	return nil
 }
 
@@ -318,6 +316,10 @@ func (p *pool) RemovePuller(stream Stream) error {
 }
 
 // Getters
+func (p *pool) GetID() PoolID {
+	return p.id
+}
+
 func (p *pool) GetReserve() USDollar {
 	return p.reserve
 }
@@ -332,7 +334,7 @@ func (p *pool) Fund(amount USDollar) USDollar {
 }
 
 // -------------------------------------------------------------------------------------------------------------
-/* 
+/*
 	Helper Functions
 */
 
@@ -353,7 +355,7 @@ func (p *pool) pull(drop Drop, amount USDollar) error {
 		}
 		drop.AddDroplet(d)
 	}
-	
+
 	return nil
 }
 
@@ -420,7 +422,7 @@ func normalize(streams []Stream, amount USDollar) (map[StreamID]USDollar, error)
 	for diff > USDollar(len(flexible)) {
 		if len(flexible) == 0 {
 			// Can't do anything more
-			break;
+			break
 		}
 
 		// Normalize
@@ -458,7 +460,5 @@ func normalize(streams []Stream, amount USDollar) (map[StreamID]USDollar, error)
 
 	// TODO: Clean up the remaining cents
 
-
 	return amounts, nil
 }
-

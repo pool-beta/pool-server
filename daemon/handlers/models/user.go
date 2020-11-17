@@ -1,14 +1,12 @@
 package models
 
-
-type Users struct {
-	Users []User `json:"users,omitempty"`
-}
-
-type User struct {
+type UserName struct {
 	UserName string `json:"username,omitempty"`
 }
 
+type ResponseGetUsers struct {
+	UserNames []UserName `json:"users,omitempty"`
+}
 
 type RequestCreateUser struct {
 	UserName string `json:"username,omitempty"`
@@ -17,5 +15,5 @@ type RequestCreateUser struct {
 
 type ResponseCreateUser struct {
 	UserName string `json:"username,omitempty"`
-	UserID uint64 `json:"user_id,omitempty"`
+	UserID   uint64 `json:"user_id,omitempty"`
 }

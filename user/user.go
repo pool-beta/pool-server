@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"sync"
 
+	. "github.com/pool-beta/pool-server/pool/types"
 	. "github.com/pool-beta/pool-server/types"
 	. "github.com/pool-beta/pool-server/user/types"
 )
 
+// Factory is used to create/remove users
 type UserFactory interface {
 	CreateUser(UserName, string, USDollar) (User, error)
 	RetrieveUser(UserName, string) (User, error)
@@ -19,16 +21,17 @@ type UserFactory interface {
 }
 
 type userRef struct {
-	user User
+	user     User
 	refCount int
-	mutex sync.Mutex
+	mutex    sync.Mutex
 }
 
 type userFactory struct {
 	userAuth UserAuth
-	users map[UserID]*userRef
+	users    map[UserID]*userRef
 }
 
+// InitFactory initializes the factory for users
 func InitUserFactory() (UserFactory, error) {
 	// Init UserAuth
 	userAuth, err := initUserAuth()
@@ -39,7 +42,7 @@ func InitUserFactory() (UserFactory, error) {
 	users := make(map[UserID]*userRef)
 	return &userFactory{
 		userAuth: userAuth,
-		users: users,
+		users:    users,
 	}, nil
 }
 
@@ -54,7 +57,7 @@ func (uf *userFactory) CreateUser(userName UserName, password string, amount USD
 
 	// Create poolRef
 	ur := &userRef{
-		user: user,
+		user:     user,
 		refCount: 1,
 	}
 
@@ -100,14 +103,13 @@ func (uf *userFactory) RemoveUser(userName UserName, password string) error {
 	return uf.userAuth.DeleteUser(userName, password)
 }
 
-
 func (uf *userFactory) RetreieveAllUserNames() ([]UserName, error) {
 	return uf.userAuth.GetAllUserNames()
 }
 
-
 // -----------------------------------------------------------------------------------------------------------
 
+// User is the interface for working with a User
 type User interface {
 	GetID() UserID
 	GetUserName() UserName
@@ -115,20 +117,33 @@ type User interface {
 	GetReserve() USDollar
 	// Puts money into the user's reserve
 	Deposit(USDollar) error
+
+	// Pools
+	GetTanks() []PoolID
+	GetPools() []PoolID
+	GetDrains() []PoolID
+
+	AddTank(PoolID) error
+	AddPool(PoolID) error
+	AddDrain(PoolID) error
 }
 
 type user struct {
-	id UserID
-	name string
+	id      UserID
+	name    string
 	reserve USDollar
+
+	tanks  []PoolID
+	pools  []PoolID
+	drains []PoolID
 
 	mutex sync.Mutex // Need for multiple logins
 }
 
 func initUser(id UserID, name string, amount USDollar) *user {
 	return &user{
-		id: id,
-		name: name,
+		id:      id,
+		name:    name,
 		reserve: amount,
 	}
 }
@@ -164,4 +179,55 @@ func (u *user) Deposit(amount USDollar) error {
 
 	u.reserve += amount
 	return nil
+}
+
+func (u *user) GetTanks() []PoolID {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	return u.tanks
+}
+
+func (u *user) AddTank(pid PoolID) error {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	// TODO: validate pid
+
+	u.tanks = append(u.tanks, pid)
+	return nil
+}
+
+func (u *user) GetPools() []PoolID {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	return u.pools
+}
+
+func (u *user) AddPool(pid PoolID) error {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	// TODO: validate pid
+
+	u.pools = append(u.pools, pid)
+	return nil
+}
+
+func (u *user) AddDrain(pid PoolID) error {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	// TODO: validate pid
+
+	u.drains = append(u.drains, pid)
+	return nil
+}
+
+func (u *user) GetDrains() []PoolID {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	return u.drains
 }

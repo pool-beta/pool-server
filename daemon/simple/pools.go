@@ -34,7 +34,12 @@ func (ps *pools) CreatePool(user User, name string) (Pool, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
+	err = user.AddPool(p.GetID())
+	if err != nil {
+		return nil, err
+	}
+
 	return &pool{
 		pool: p,
 	}, nil
@@ -42,6 +47,11 @@ func (ps *pools) CreatePool(user User, name string) (Pool, error) {
 
 func (ps *pools) CreateDrainPool(user User, name string) (Drain, error) {
 	d, err := ps.pf.CreatePool(name, user.ID(), DRAIN)
+	if err != nil {
+		return nil, err
+	}
+
+	err = user.AddDrain(d.GetID())
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +67,11 @@ func (ps *pools) CreateTankPool(user User, name string) (Tank, error) {
 		return nil, err
 	}
 
+	err = user.AddTank(t.GetID())
+	if err != nil {
+		return nil, err
+	}
+
 	return &pool{
 		pool: t,
 	}, nil
@@ -64,11 +79,18 @@ func (ps *pools) CreateTankPool(user User, name string) (Tank, error) {
 
 // Returns the pool with the pid; could be pool, drain, or tank
 func (ps *pools) GetPool(pid PoolID) (Pool, error) {
-	return nil, nil
+	p, err := ps.pf.RetrievePool(pid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pool{
+		pool: p,
+	}, nil
 }
 
 func (ps *pools) RemovePool(pid PoolID) error {
-	
+
 	return nil
 }
 
