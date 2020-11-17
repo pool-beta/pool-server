@@ -103,6 +103,7 @@ type Pool interface {
 
 	// Getters
 	GetID() PoolID
+	GetName() string
 	GetReserve() USDollar
 
 	// Stream Control
@@ -318,6 +319,10 @@ func (p *pool) RemovePuller(stream Stream) error {
 // Getters
 func (p *pool) GetID() PoolID {
 	return p.id
+}
+
+func (p *pool) GetName() string {
+	return p.name
 }
 
 func (p *pool) GetReserve() USDollar {

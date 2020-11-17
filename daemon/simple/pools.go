@@ -120,6 +120,14 @@ func (p *pool) CreatePushFlow() (Flow, error) {
 	return nil, nil
 }
 
+func (p *pool) ID() PoolID {
+	return p.pool.GetID()
+}
+
+func (p *pool) Name() string {
+	return p.pool.GetName()
+}
+
 func (p *pool) CleanUp() error {
 	return nil
 }

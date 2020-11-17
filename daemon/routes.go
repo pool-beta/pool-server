@@ -13,4 +13,7 @@ func registerRoutes(handler Handler) {
 	// User Routes
 	http.HandleFunc("/users", handler.GetUsers)
 	http.HandleFunc("/users/create", handler.CreateUser)
+
+	// Pool Routes
+	http.HandleFunc("/user/tanks/create", handler.CreateTank)
 }

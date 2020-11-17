@@ -61,35 +61,3 @@ func (h *handler) GetUsers(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
-
-/* User Specific Handlers */
-
-// Creates a new tank for the User
-func (h *handler) CreateTank(http.ResponseWriter, *http.Request) {
-
-}
-
-// Creates a new pool for the user
-func (h *handler) CreatePool(http.ResponseWriter, *http.Request) {
-
-}
-
-// Creates a new drain for the user
-func (h *handler) CreateDrain(http.ResponseWriter, *http.Request) {
-
-}
-
-// Returns all tanks owned by user
-func (h *handler) GetTanks(http.ResponseWriter, *http.Request) {
-
-}
-
-// Returns all pools owned by user
-func (h *handler) GetPools(http.ResponseWriter, *http.Request) {
-
-}
-
-// Returns all drains owned by user
-func (h *handler) GetDrains(http.ResponseWriter, *http.Request) {
-
-}
