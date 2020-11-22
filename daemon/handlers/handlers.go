@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/pool-beta/pool-server/daemon/handlers/models"
-	. "github.com/pool-beta/pool-server/daemon/handlers/models"
 	"github.com/pool-beta/pool-server/daemon/simple"
 )
 
@@ -52,7 +51,7 @@ func NewHandler() (Handler, error) {
 }
 
 func (h *handler) TestHandler(w http.ResponseWriter, req *http.Request) {
-	var test Test
+	var test models.Test
 
 	err := json.NewDecoder(req.Body).Decode(&test)
 	if err != nil {
