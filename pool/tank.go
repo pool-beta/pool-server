@@ -1,8 +1,8 @@
 package pool
 
 import (
-	. "github.com/pool-beta/pool-server/types"
 	. "github.com/pool-beta/pool-server/pool/types"
+	. "github.com/pool-beta/pool-server/types"
 	. "github.com/pool-beta/pool-server/user/types"
 )
 
@@ -28,4 +28,8 @@ func (t *tank) PullDrop(drop Drop, useReserve bool) error {
 
 	// TODO: log the pull
 	return nil
+}
+
+func (t *tank) GetType() string {
+	return "tank"
 }

@@ -3,12 +3,12 @@ package pool
 import (
 	"fmt"
 
-	. "github.com/pool-beta/pool-server/types"
 	. "github.com/pool-beta/pool-server/pool/types"
+	. "github.com/pool-beta/pool-server/types"
 	. "github.com/pool-beta/pool-server/user/types"
 )
 
-/* 
+/*
 	Drain is pool with no reserve, and cannot push
 	It implements the POOL debit card
 */
@@ -62,4 +62,8 @@ func (d *drain) PushDrop(drop Drop, useReserve bool) error {
 	// Accept all pushes
 	drop.AddWithheld(USDollar(0))
 	return nil
+}
+
+func (d *drain) GetType() string {
+	return "drain"
 }

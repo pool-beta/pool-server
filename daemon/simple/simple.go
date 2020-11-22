@@ -65,6 +65,7 @@ type Pools interface {
 type Pool interface {
 	ID() PoolID
 	Name() string
+	Type() string
 
 	CreateStream(Pool) (Stream, error)
 	GetStream(StreamID) (Stream, error)

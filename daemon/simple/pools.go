@@ -128,6 +128,10 @@ func (p *pool) Name() string {
 	return p.pool.GetName()
 }
 
+func (p *pool) Type() string {
+	return p.pool.GetType()
+}
+
 func (p *pool) CleanUp() error {
 	return nil
 }
