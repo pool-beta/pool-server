@@ -9,4 +9,4 @@ This repository contains the implementation of the backend server for Pool.
 
 ### Pool Server
 * [Server Setup Guide](https://github.com/pool-beta/pool-server/tree/master/doc/guides/setup.md)
-* [Sever Overview](https://github.com/pool-beta/pool-server/tree/master/doc/design/server.md)
+* [Server Overview](https://github.com/pool-beta/pool-server/tree/master/doc/design/server.md)
