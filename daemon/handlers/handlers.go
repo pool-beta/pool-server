@@ -54,7 +54,7 @@ func (h *handler) TestHandler(w http.ResponseWriter, req *http.Request) {
 	var test models.Test
 
 	err := json.NewDecoder(req.Body).Decode(&test)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
