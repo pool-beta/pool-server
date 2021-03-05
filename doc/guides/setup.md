@@ -10,6 +10,7 @@
 2. `cd` into the cloned directory
 3. Run `go run main.go`
 4. pool-server will now run and listen on the specified port (default: 8000)
+5. Open on your browser http://localhost:8000
 
 ## Sending Requests
 ### Postman
