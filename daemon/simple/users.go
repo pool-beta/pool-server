@@ -80,8 +80,22 @@ func (u *user) UserName() UserName {
 	return u.user.GetUserName()
 }
 
-func (u *user) AddTank(pid PoolID) error {
-	return u.user.AddTank(pid)
+/* Add Pool */
+func (u *user) AddTank(tank Tank) error {
+	return u.user.AddTank(tank.Name(), tank.ID())
+}
+
+func (u *user) AddPool(pool Pool) error {
+	return u.user.AddPool(pool.Name(), pool.ID())
+}
+
+func (u *user) AddDrain(drain Drain) error {
+	return u.user.AddDrain(drain.Name(), drain.ID())
+}
+
+/* Get Pool */
+func (u *user) GetTank(name string) (Tank, error) {
+
 }
 
 func (u *user) Tanks() ([]Tank, error) {
@@ -102,10 +116,6 @@ func (u *user) Tanks() ([]Tank, error) {
 	return tanks, nil
 }
 
-func (u *user) AddPool(pid PoolID) error {
-	return u.user.AddPool(pid)
-}
-
 func (u *user) Pools() ([]Pool, error) {
 	pids := u.user.GetPools()
 
@@ -122,10 +132,6 @@ func (u *user) Pools() ([]Pool, error) {
 	}
 
 	return pools, nil
-}
-
-func (u *user) AddDrain(pid PoolID) error {
-	return u.user.AddDrain(pid)
 }
 
 func (u *user) Drains() ([]Drain, error) {

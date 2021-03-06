@@ -35,12 +35,18 @@ type User interface {
 	ID() UserID
 	UserName() UserName
 
-	AddTank(PoolID) error
-	Tanks() ([]Tank, error)
-	AddPool(PoolID) error
-	Pools() ([]Pool, error)
-	AddDrain(PoolID) error
-	Drains() ([]Drain, error)
+	AddTank(Tank) error
+	GetTank(string) (Tank, error)
+	GetTanks() ([]Tank, error)
+
+	AddPool(Pool) error
+	GetPool(string) (Pool, error)
+	GetPools() ([]Pool, error)
+
+	AddDrain(Drain) error
+	GetDrain(string) (Drain, error)
+	GetDrains() ([]Drain, error)
+
 	Flows() []Flow
 
 	CleanUp() error

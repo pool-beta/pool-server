@@ -32,6 +32,9 @@ type Handler interface {
 	GetTanks(http.ResponseWriter, *http.Request)
 	GetPools(http.ResponseWriter, *http.Request)
 	GetDrains(http.ResponseWriter, *http.Request)
+
+	// Flow (Push/Pull)
+	PayDebit(http.ResponseWriter, *http.Request)
 }
 
 type handler struct {
@@ -111,19 +114,32 @@ func (h *handler) TestSetup(w http.ResponseWriter, req *http.Request) {
 	pools, err := h.pools()
 
 	for _, u := range users {
-		_, err = pools.CreateTankPool(u, "tank0")
+		tank, err := pools.CreateTankPool(u, "tank0")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		_, err = pools.CreatePool(u, "pool0")
+		pool, err := pools.CreatePool(u, "pool0")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		_, err = pools.CreateDrainPool(u, "drain0")
+		drain, err := pools.CreateDrainPool(u, "drain0")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// Add Streams
+		_, err = tank.CreateStream(pool)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		_, err = pool.CreateStream(drain)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

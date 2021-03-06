@@ -119,13 +119,17 @@ type User interface {
 	Deposit(USDollar) error
 
 	// Pools
-	GetTanks() []PoolID
-	GetPools() []PoolID
-	GetDrains() []PoolID
+	GetTank(string) PoolID
+	GetPool(string) PoolID
+	GetDrain(string) PoolID
 
-	AddTank(PoolID) error
-	AddPool(PoolID) error
-	AddDrain(PoolID) error
+	AddTank(string, PoolID) error
+	AddPool(string, PoolID) error
+	AddDrain(string, PoolID) error
+
+	GetTanks() map[string]PoolID
+	GetPools() map[string]PoolID
+	GetDrains() map[string]PoolID
 }
 
 type user struct {
@@ -133,9 +137,9 @@ type user struct {
 	name    string
 	reserve USDollar
 
-	tanks  []PoolID
-	pools  []PoolID
-	drains []PoolID
+	tanks  map[string]PoolID
+	pools  map[string]PoolID
+	drains map[string]PoolID
 
 	mutex sync.Mutex // Need for multiple logins
 }
@@ -181,53 +185,80 @@ func (u *user) Deposit(amount USDollar) error {
 	return nil
 }
 
-func (u *user) GetTanks() []PoolID {
+func (u *user) GetTank(name string) PoolID {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	return u.tanks[name]
+}
+
+func (u *user) GetTanks() map[string]PoolID {
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
 
 	return u.tanks
 }
 
-func (u *user) AddTank(pid PoolID) error {
+func (u *user) AddTank(name string, pid PoolID) error {
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
 
 	// TODO: validate pid
-
-	u.tanks = append(u.tanks, pid)
+	if _, exists := u.tanks[name]; exists {
+		return fmt.Errorf("Name not avaiable -- name: %v", name)
+	}
+	u.tanks[name] = pid
 	return nil
 }
 
-func (u *user) GetPools() []PoolID {
+func (u *user) GetPool(name string) PoolID {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	return u.pools[name]
+}
+
+func (u *user) GetPools() map[string]PoolID {
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
 
 	return u.pools
 }
 
-func (u *user) AddPool(pid PoolID) error {
+func (u *user) AddPool(name string, pid PoolID) error {
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
 
 	// TODO: validate pid
-
-	u.pools = append(u.pools, pid)
+	if _, exists := u.pools[name]; exists {
+		return fmt.Errorf("Name not avaiable -- name: %v", name)
+	}
+	u.pools[name] = pid
 	return nil
 }
 
-func (u *user) AddDrain(pid PoolID) error {
+func (u *user) GetDrain(name string) PoolID {
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
 
-	// TODO: validate pid
-
-	u.drains = append(u.drains, pid)
-	return nil
+	return u.drains[name]
 }
 
-func (u *user) GetDrains() []PoolID {
+func (u *user) GetDrains() map[string]PoolID {
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
 
 	return u.drains
+}
+
+func (u *user) AddDrain(name string, pid PoolID) error {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+
+	// TODO: validate pid
+	if _, exists := u.drains[name]; exists {
+		return fmt.Errorf("Name not avaiable -- name: %v", name)
+	}
+	u.drains[name] = pid
+	return nil
 }
