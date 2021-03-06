@@ -3,6 +3,7 @@ package pool
 import (
 	"fmt"
 	"sync"
+	"log"
 
 	. "github.com/pool-beta/pool-server/pool/types"
 	. "github.com/pool-beta/pool-server/types"
@@ -39,6 +40,7 @@ func InitPoolFactory() (PoolFactory, error) {
 	}, nil
 }
 
+// Usage: pool1, err := poolFactory.CreatePool(name, user1, TANK)
 func (pf *poolFactory) CreatePool(poolName string, owner UserID, poolType PoolType) (Pool, error) {
 	// TODO: Validate owner
 
@@ -235,6 +237,8 @@ func (p *pool) PushDrop(drop Drop, useReserve bool) error {
 		}
 	}
 
+	log.Printf("PushDrop -- poolID: %v, reserve: %v, useReserve: %v", p.GetID(), p.GetReserve(), useReserve)
+
 	return p.push(drop, amount)
 }
 
@@ -262,6 +266,8 @@ func (p *pool) PullDrop(drop Drop, useReserve bool) error {
 			return nil
 		}
 	}
+
+	log.Printf("PullDrop -- poolID: %v, reserve: %v, useReserve: %v", p.GetID(), p.GetReserve(), useReserve)
 	return p.pull(drop, amount)
 }
 
