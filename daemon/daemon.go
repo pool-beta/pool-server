@@ -1,15 +1,14 @@
 package daemon
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	. "github.com/pool-beta/pool-server/daemon/handlers"
 )
 
-const PORT = ":8000"
-
-func Run() {
+func Run(port string) {
 	
 	// Start Handlers
 	// Should only be called once (singleton)
@@ -22,6 +21,6 @@ func Run() {
 	registerRoutes(handler)
 
 	// Start Http Server
-    log.Printf("POOL Backend Server has be started. Listening on http://localhost%v.", PORT)
-	log.Fatal(http.ListenAndServe(PORT, nil))
+    log.Printf("POOL Backend Server has been started. Listening on http://localhost:%v", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
 }

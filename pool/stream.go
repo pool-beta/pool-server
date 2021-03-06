@@ -88,6 +88,8 @@ type StreamConfig interface {
 	GetPercentOverdraft() Percent
 	SetPercentOverdraft(Percent)
 
+	// TODO: add MaxPercentOverdraft
+
 	GetMaxOverdraft() USDollar
 	SetMaxOverdraft(USDollar)
 
