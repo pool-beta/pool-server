@@ -29,7 +29,7 @@ echo "Done."
 
 
 # Check if GOPATH in PATH
-if [[ "$PATH" != *"$GOPATH"* ]] 
+if [[ "$PATH" != *"$GOPATH/bin"* ]] 
 then
 	echo "Adding GOPATH to PATH"
 	export PATH=$PATH:$GOPATH/bin
