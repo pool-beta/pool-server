@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/pool-beta/pool-server/daemon"
+    "github.com/pool-beta/pool-server/cmd"
 )
 
 func main() {
-	daemon.Run()
+	cmd.Execute()
 }

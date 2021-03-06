@@ -1,10 +1,9 @@
 package main
 
 import (
-	// "flag"
-    "fmt"
+    "github.com/pool-beta/pool-server/pool-cli/cmd"
 )
 
 func main() {
-	fmt.Println("Pool Client")
+	cmd.Execute()
 }
