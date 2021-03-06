@@ -22,6 +22,6 @@ func Run() {
 	registerRoutes(handler)
 
 	// Start Http Server
-    log.Printf("POOL Backend Server has be started. Listening on http://localhost%v.", PORT)
+    log.Printf("POOL Backend Server has been started. Listening on http://localhost%v.", PORT)
 	log.Fatal(http.ListenAndServe(PORT, nil))
 }
