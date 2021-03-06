@@ -32,7 +32,7 @@ echo "Done."
 if [[ "$PATH" != *"$GOPATH"* ]] 
 then
 	echo "Adding GOPATH to PATH"
-	export PATH=$PATH:$GOPATH
+	export PATH=$PATH:$GOPATH/bin
 fi
 
 
