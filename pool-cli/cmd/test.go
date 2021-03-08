@@ -10,6 +10,7 @@ func init() {
   rootCmd.AddCommand(testCmd)
 
   testCmd.AddCommand(testSetupCmd)
+  testCmd.AddCommand(testResetCmd)
 }
 
 var testCmd = &cobra.Command{
@@ -29,5 +30,19 @@ var testSetupCmd = &cobra.Command{
       }
 
       RunTestSetup(ctx)
+  },
+}
+
+var testResetCmd = &cobra.Command{
+  Use:   "reset",
+  Short: "Pool Server Reset for Testing",
+  Long:  `Resets dummy users and pools`,
+  Run: func(cmd *cobra.Command, args []string) {
+      ctx, err := NewContext(url)
+      if err != nil {
+        return
+      }
+
+      RunTestReset(ctx)
   },
 }
