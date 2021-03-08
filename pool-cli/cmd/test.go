@@ -1,9 +1,9 @@
 package cmd
 
 import (
-  "fmt"
 
   "github.com/spf13/cobra"
+  . "github.com/pool-beta/pool-server/pool-cli/api"
 )
 
 func init() {
@@ -23,6 +23,11 @@ var testSetupCmd = &cobra.Command{
   Short: "Quick Pool Server Setup for Testing",
   Long:  `Creates dummy users and pools`,
   Run: func(cmd *cobra.Command, args []string) {
-    fmt.Println("Running test setup...")
+      ctx, err := NewContext(url)
+      if err != nil {
+        return
+      }
+
+      RunTestSetup(ctx)
   },
 }
