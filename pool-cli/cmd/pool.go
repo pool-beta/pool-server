@@ -10,6 +10,7 @@ func init() {
   rootCmd.AddCommand(poolCmd)
 
   poolCmd.AddCommand(poolGetCmd)
+  poolCmd.AddCommand(poolCreateCmd)
   
 
 }
@@ -32,5 +33,20 @@ var poolGetCmd = &cobra.Command{
       }
 
       RunPoolGet(ctx, args[0], args[1], args[2])
+  },
+}
+
+var poolCreateCmd = &cobra.Command{
+  Use:   "create <username> <password> <poolname>",
+  Short: "Create pool",
+  Long:  `Create pool for user`,
+  Args: cobra.MinimumNArgs(3),
+  Run: func(cmd *cobra.Command, args []string) {
+      ctx, err := NewContext(url)
+      if err != nil {
+        return
+      }
+
+      RunPoolCreate(ctx, args[0], args[1], args[2])
   },
 }

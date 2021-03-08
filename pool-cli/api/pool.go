@@ -39,3 +39,31 @@ func RunPoolGet(ctx Context, username string, password string, pool_id string) {
 	resp, err := ioutil.ReadAll(res.Body)
 	fmt.Println(string(resp))
 }
+
+func RunPoolCreate(ctx Context, username string, password string, poolname string) {
+	fmt.Printf("Creating pool: %v\n", ctx.Url())
+
+	var request models.RequestCreatePool
+
+	request.UserAuth.UserName = username
+	request.UserAuth.Password = password
+
+	route := ctx.Url() + "/pools/create"
+	data, _ := json.Marshal(request)
+	
+	body := bytes.NewBuffer(data)
+
+	req, err := NewRequest("GET", route, body)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	res, err := ctx.Do(req)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer res.Body.Close()
+	// Read the response body
+	resp, err := ioutil.ReadAll(res.Body)
+	fmt.Println(string(resp))
+}
