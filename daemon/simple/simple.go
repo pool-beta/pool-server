@@ -47,7 +47,7 @@ type User interface {
 	GetDrain(string) (Drain, error)
 	GetDrains() ([]Drain, error)
 
-	Flows() []Flow
+	GetFlows() []Flow
 
 	CleanUp() error
 }

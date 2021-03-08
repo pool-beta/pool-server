@@ -35,7 +35,7 @@ func (ps *pools) CreatePool(user User, name string) (Pool, error) {
 		return nil, err
 	}
 
-	err = user.AddPool(p.GetID())
+	err = user.AddPool(&pool{pool: p})
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (ps *pools) CreateDrainPool(user User, name string) (Drain, error) {
 		return nil, err
 	}
 
-	err = user.AddDrain(d.GetID())
+	err = user.AddDrain(&pool{pool: d})
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (ps *pools) CreateTankPool(user User, name string) (Tank, error) {
 		return nil, err
 	}
 
-	err = user.AddTank(t.GetID())
+	err = user.AddTank(&pool{pool: t})
 	if err != nil {
 		return nil, err
 	}

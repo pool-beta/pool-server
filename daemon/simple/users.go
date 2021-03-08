@@ -1,7 +1,6 @@
 package simple
 
 import (
-	. "github.com/pool-beta/pool-server/pool/types"
 	. "github.com/pool-beta/pool-server/types"
 	puser "github.com/pool-beta/pool-server/user"
 	. "github.com/pool-beta/pool-server/user/types"
@@ -95,64 +94,74 @@ func (u *user) AddDrain(drain Drain) error {
 
 /* Get Pool */
 func (u *user) GetTank(name string) (Tank, error) {
-
+	return u.pools.GetPool(u.user.GetTank(name))
 }
 
-func (u *user) Tanks() ([]Tank, error) {
+func (u *user) GetPool(name string) (Pool, error) {
+	return u.pools.GetPool(u.user.GetPool(name))
+}
+
+func (u *user) GetDrain(name string) (Drain, error) {
+	return u.pools.GetPool(u.user.GetDrain(name))
+}
+
+/* Get Pools */
+
+func (u *user) GetTanks() ([]Tank, error) {
 	pids := u.user.GetTanks()
 
 	// Create simple tanks to return to return
-	tanks := make([]Tank, len(pids))
+	tanks := make([]Tank, 0)
 
-	for i, pid := range pids {
+	for _, pid := range pids {
 		tank, err := u.pools.GetPool(pid)
 		if err != nil {
 			return nil, err
 		}
 
-		tanks[i] = tank
+		tanks= append(tanks, tank)
 	}
 
 	return tanks, nil
 }
 
-func (u *user) Pools() ([]Pool, error) {
+func (u *user) GetPools() ([]Pool, error) {
 	pids := u.user.GetPools()
 
 	// Create simple tanks to return to return
-	pools := make([]Pool, len(pids))
+	pools := make([]Pool, 0)
 
-	for i, pid := range pids {
+	for _, pid := range pids {
 		pool, err := u.pools.GetPool(pid)
 		if err != nil {
 			return nil, err
 		}
 
-		pools[i] = pool
+		pools = append(pools, pool)
 	}
 
 	return pools, nil
 }
 
-func (u *user) Drains() ([]Drain, error) {
-	pids := u.user.GetTanks()
+func (u *user) GetDrains() ([]Drain, error) {
+	pids := u.user.GetDrains()
 
 	// Create simple tanks to return to return
-	drains := make([]Drain, len(pids))
+	drains := make([]Drain, 0)
 
-	for i, pid := range pids {
+	for _, pid := range pids {
 		drain, err := u.pools.GetPool(pid)
 		if err != nil {
 			return nil, err
 		}
 
-		drains[i] = drain
+		drains = append(drains, drain)
 	}
 
 	return drains, nil
 }
 
-func (u *user) Flows() []Flow {
+func (u *user) GetFlows() []Flow {
 	return nil
 }
 
