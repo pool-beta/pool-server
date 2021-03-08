@@ -7,13 +7,11 @@ import (
 	"encoding/json"
 )
 
-func RunTestSetup(ctx Context) {
-	fmt.Printf("Setting up a simple network for testing: %v\n", ctx.Url())
+func RunUserList(ctx Context) {
+	fmt.Printf("Getting User List: %v\n", ctx.Url())
 
-	route := ctx.Url() + "/test/setup"
-	data, _ := json.Marshal(map[string]string{
-		"password": "admin",
-	})
+	route := ctx.Url() + "/users"
+	data, _ := json.Marshal(map[string]string{})
 	body := bytes.NewBuffer(data)
 
 	req, err := NewRequest("GET", route, body)
@@ -31,12 +29,13 @@ func RunTestSetup(ctx Context) {
 	fmt.Println(string(resp))
 }
 
-func RunTestReset(ctx Context) {
-	fmt.Printf("Reseting this simple network for testing: %v\n", ctx.Url())
+func RunUserCreate(ctx Context, username string, password string) {
+	fmt.Printf("Creating new user: %v\n", ctx.Url())
 
-	route := ctx.Url() + "/test/reset"
+	route := ctx.Url() + "/users/create"
 	data, _ := json.Marshal(map[string]string{
-		"password": "admin",
+		"username": username,
+		"password": password,
 	})
 	body := bytes.NewBuffer(data)
 
@@ -54,9 +53,3 @@ func RunTestReset(ctx Context) {
 	resp, err := ioutil.ReadAll(res.Body)
 	fmt.Println(string(resp))
 }
-
-
-
-
-
-
